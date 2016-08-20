@@ -19,7 +19,7 @@ Route::get('/', function(){
         return view('welcome');
     }
     else
-        return redirect('auth/login');
+        return redirect('auth/register');
 });
 
 // 认证路由...
