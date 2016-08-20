@@ -11,16 +11,9 @@
 |
 */
 
-/*Route::get('/', ['middleware' => 'auth', function() {
-    return view('welcome');
-}]);*/
-Route::get('/', function(){
-    if(Auth::check()){
-        return view('welcome');
-    }
-    else
-        return redirect('auth/register');
-});
+Route::get('/', 'HomeController@index');
+
+Route::get('/profile','ProfileController@index');
 
 // 认证路由...
 Route::get('auth/login', 'Auth\AuthController@getLogin');

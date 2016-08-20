@@ -10,6 +10,7 @@
 
     <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
     <script src="{{ URL::asset('assets/js/bootstrap.min.js') }}"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@yield('title') - Toy Cautious Doodle</title>
 </head>
 <body>
