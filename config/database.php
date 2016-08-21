@@ -55,8 +55,8 @@ return [
         'mysql' => [
             'driver'    => 'mysql',
             'host'      => env('DB_HOST', 'localhost'),
-            'database'  => env('DB_DATABASE', 'toycautiousdoodle'),
-            'username'  => env('DB_USERNAME', 'toycautiousdoodle'),
+            'database'  => env('DB_DATABASE', 'tcd'),
+            'username'  => env('DB_USERNAME', 'tcd'),
             'password'  => env('DB_PASSWORD', 'cool2645'),
             'charset'   => 'utf8',
             'collation' => 'utf8_unicode_ci',
@@ -67,8 +67,8 @@ return [
         'pgsql' => [
             'driver'   => 'pgsql',
             'host'     => env('DB_HOST', 'localhost'),
-            'database' => env('DB_DATABASE', 'toycautiousdoodle'),
-            'username' => env('DB_USERNAME', 'toycautiousdoodle'),
+            'database' => env('DB_DATABASE', 'tcd'),
+            'username' => env('DB_USERNAME', 'tcd'),
             'password' => env('DB_PASSWORD', 'cool2645'),
             'charset'  => 'utf8',
             'prefix'   => '',
@@ -78,8 +78,8 @@ return [
         'sqlsrv' => [
             'driver'   => 'sqlsrv',
             'host'     => env('DB_HOST', 'localhost'),
-            'database' => env('DB_DATABASE', 'toycautiousdoodle'),
-            'username' => env('DB_USERNAME', 'toycautiousdoodle'),
+            'database' => env('DB_DATABASE', 'tcd'),
+            'username' => env('DB_USERNAME', 'tcd'),
             'password' => env('DB_PASSWORD', 'cool2645'),
             'charset'  => 'utf8',
             'prefix'   => '',
