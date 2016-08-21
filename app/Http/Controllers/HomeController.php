@@ -18,7 +18,7 @@ class HomeController extends Controller
     public function index(Request $request)
     {
         $user = $request->user()['email'];
-        return view('home',['user' => $user]);
+        return view('home', ['user' => $user]);
     }
 
 }

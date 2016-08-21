@@ -9,7 +9,7 @@
 
     <div class="container">
         <div class="row" style="margin-top: 20px">
-            <center><img src="/img/0820_2.gif" alt="Cautious doodle" /></center>
+            <center><img src="/img/0820_2.gif" alt="Cautious doodle"/></center>
         </div>
         <div class="row">
             <center><h1>Toy Cautious Doodle</h1></center>

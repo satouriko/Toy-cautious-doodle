@@ -10,8 +10,9 @@
             padding-bottom: 7.5px;
             padding-right: 7.5px
         }
+
         .navbar-top-links {
-            margin-right:10px;
+            margin-right: 10px;
         }
     </style>
     <!-- Navigation -->
