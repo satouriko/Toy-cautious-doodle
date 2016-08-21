@@ -19,7 +19,6 @@ class ProfileController extends Controller
     {
         $user = $request->user()['email'];
         $uid = $request->user()['id'];
-        $Nicknames = Nickname::where('uid', $uid)->get();
-        return view('profile',['user' => $user, 'nicknames' => $Nicknames]);
+        return view('profile',['user' => $user, 'uid' => $uid]);
     }
 }

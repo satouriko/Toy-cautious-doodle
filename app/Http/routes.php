@@ -13,7 +13,10 @@
 
 Route::get('/', 'HomeController@index');
 
-Route::get('/profile','ProfileController@index');
+Route::get('profile','ProfileController@index');
+
+Route::resource('profile/nickname', 'Profile\NicknameController',
+    ['only' => ['index', 'store','destroy']]);
 
 // 认证路由...
 Route::get('auth/login', 'Auth\AuthController@getLogin');
