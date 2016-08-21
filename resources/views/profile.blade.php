@@ -7,23 +7,34 @@
 @section('content')
 
     <style>
-        .container {
-            width: 1010px;
+        .profile-container {
+            width: 100%;
+            max-width: 1010px;
             display: table;
             margin-left: auto;
             margin-right: auto;
-            padding-left: 15px;
-            padding-right: 15px;
+            /*padding-left: 15px;
+            padding-right: 15px;*/
         }
 
         .left-section {
-            width: 250px;
+            min-width: 250px;
+            float: left;
+            padding-left: 10px;
+            padding-right: 10px;
+        }
+
+        .right-section {
+            max-width: 750px;
             float: left;
             padding-left: 10px;
             padding-right: 10px;
         }
 
         .avatar {
+            margin-left: auto;
+            margin-right: auto;
+            display: table;
             width: 230px;
             height: 230px;
             border-radius: 6px;
@@ -49,9 +60,9 @@
 
     </style>
 
-    <div class="container">
-        <div class="left-section">
-            <img class="avatar" src="/img/0820_2.gif" alt="Cautious doodle"/>
+    <div class="profile-container">
+        <div class="left-section col-xs-12 col-sm-4">
+            <img class="avatar" src="/img/avatar.gif" alt="Cautious doodle"/>
             <br/><br/>
             <div class="panel panel-default">
                 <div class="panel-heading">
@@ -124,6 +135,18 @@
                 })
             </script>
 
+        </div>
+        <div class="right-section col-xs-12 col-sm-8">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        我的昵称
+                    </h3>
+                </div>
+                <div class="panel-body">
+                    内容
+                </div>
+            </div>
         </div>
     </div>
 @endsection
