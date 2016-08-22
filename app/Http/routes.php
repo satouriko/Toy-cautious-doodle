@@ -13,10 +13,13 @@
 
 Route::get('/', 'HomeController@index');
 
-Route::get('profile','ProfileController@index');
+Route::get('profile', 'ProfileController@index');
 
 Route::resource('profile/nickname', 'Profile\NicknameController',
-    ['only' => ['index', 'store','destroy']]);
+    ['only' => ['index', 'store', 'destroy']]);
+
+Route::resource('profile/signature', 'Profile\SignatureController',
+    ['only' => ['index', 'store', 'update', 'destroy']]);
 
 // 认证路由...
 Route::get('auth/login', 'Auth\AuthController@getLogin');
