@@ -2,15 +2,14 @@
 
 namespace App\Http\Controllers\Profile;
 
-use App\Signature;
+use App\Task;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 
-class SignatureController extends Controller
+class RegularTaskController extends Controller
 {
-
     public function __construct()
     {
         $this->middleware('auth');
@@ -24,8 +23,8 @@ class SignatureController extends Controller
     public function index(Request $request)
     {
         $uid = $request->user()['id'];
-        $Signatures = Signature::where('uid', $uid)->get();
-        $data_str = json_encode($Signatures);
+        $Tasks = Task::where('uid', $uid)->where('temporary', false)->where('valid', true)->get();
+        $data_str = json_encode($Tasks);
         return $data_str;
     }
 
@@ -37,14 +36,19 @@ class SignatureController extends Controller
      */
     public function store(Request $request)
     {
-        $signature = new Signature();
+        $task = new Task();
 
-        $signature->uid = $request->user()['id'];;
-        $signature->signature = $request->signature;
+        $task->uid = $request->user()['id'];
+        $task->startdate = $request->startdate;
+        $task->period = $request->period;
+        $task->activeday = $request->activeday;
+        $task->temporary = false;
+        $task->valid = true;
+        $task->title = $request->title;
+        $task->description = $request->description;
 
-        $signature->save();
+        $task->save();
     }
-
 
     /**
      * Update the specified resource in storage.
@@ -55,9 +59,13 @@ class SignatureController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $signature = Signature::find($id);
-        $signature->signature = $request->signature;
-        $signature->save();
+        $task = Task::find($id);
+        $task->period = $request->period;
+        $task->activeday = $request->activeday;
+        $task->title = $request->title;
+        $task->description = $request->description;
+
+        $task->save();
     }
 
     /**
@@ -68,6 +76,9 @@ class SignatureController extends Controller
      */
     public function destroy($id)
     {
-        Signature::destroy($id);
+        $task = Task::find($id);
+        $task->valid = false;
+        $task->expiredate = date('Y-m-d');
+        $task->save();
     }
 }
