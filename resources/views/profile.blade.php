@@ -164,7 +164,7 @@
                 function loadRgtaskUl() {
                     $.ajax({
                         type: "GET",
-                        url: "/profile/rgtask",
+                        url: "/task/rgtask",
                         success: function (msg) {
                             $("#rgtask_ul").empty();
                             var dataObj = eval("(" + msg + ")");
@@ -182,13 +182,13 @@
                     $("#updateRgtask_smt").text("修改");
                     $.ajax({
                         type: "GET",
-                        url: "/profile/rgtask",
+                        url: "/task/rgtask",
                         success: function (msg) {
                             var dataObj = eval("(" + msg + ")");
                             for (i in dataObj) {
                                 if (dataObj[i].id == id) {
                                     $("#tasktitle").val(dataObj[i].title);
-                                    $("#taskdesc").html(dataObj[i].description);
+                                    $("#taskdesc").val(dataObj[i].description);
                                     $("#startdate").val(dataObj[i].startdate);
                                     $("#period").val(dataObj[i].period);
                                     $("#taskday").val(dataObj[i].activeday);
@@ -205,7 +205,7 @@
                     }).get().join("&");
                     $.ajax({
                         type: "POST",
-                        url: "/profile/rgtask/" + id.toString(),
+                        url: "/task/rgtask/" + id.toString(),
                         data: str_data,
                         success: function (msg) {
                             loadRgtaskUl();
@@ -217,7 +217,7 @@
                     $("#rgtask_smt").click(function () {
                         $("#rgtaskModalTitle").html("新增任务");
                         $("#rgtask_fm input[type='text']").val("");
-                        $("#rgtask_fm textarea").text("");
+                        $("#rgtask_fm textarea").val("");
                         $("#rgtask_fm input[type='date']").val("");
                         $("#rgtask_fm input[type='number']").val("");
                         $("#startdate").removeAttr("disabled");

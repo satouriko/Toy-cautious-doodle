@@ -21,7 +21,7 @@ Route::resource('profile/nickname', 'Profile\NicknameController',
 Route::resource('profile/signature', 'Profile\SignatureController',
     ['only' => ['index', 'store', 'update', 'destroy']]);
 
-Route::resource('profile/rgtask', 'Profile\RegularTaskController',
+Route::resource('task/rgtask', 'Task\RegularTaskController',
     ['only' => ['index', 'store', 'update', 'destroy']]);
 
 // 认证路由...

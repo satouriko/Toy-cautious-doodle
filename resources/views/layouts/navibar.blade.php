@@ -59,7 +59,7 @@
             $("#ddm_adrgtask").click(function () {
                 $("#rgtaskModalTitle").html("新增任务");
                 $("#rgtask_fm input[type='text']").val("");
-                $("#rgtask_fm textarea").text("");
+                $("#rgtask_fm textarea").val("");
                 $("#rgtask_fm input[type='date']").val("");
                 $("#rgtask_fm input[type='number']").val("");
                 $("#startdate").removeAttr("disabled");
@@ -77,7 +77,7 @@
                     var str_data = str_data1 + '&' + str_data2;
                     $.ajax({
                         type: "POST",
-                        url: "/profile/rgtask",
+                        url: "/task/rgtask",
                         data: str_data,
                         success: function (msg) {
                             $("#rgtaskEditModal").modal('hide');
@@ -97,7 +97,7 @@
                     var id = $("#rgtaskEditId").val();
                     $.ajax({
                         type: "POST",
-                        url: "/profile/rgtask/" + id.toString(),
+                        url: "/task/rgtask/" + id.toString(),
                         data: str_data,
                         success: function (msg) {
                             $("#rgtaskEditModal").modal('hide');
