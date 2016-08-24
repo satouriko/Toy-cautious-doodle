@@ -217,51 +217,13 @@
                     $("#rgtask_smt").click(function () {
                         $("#rgtaskModalTitle").html("新增任务");
                         $("#rgtask_fm input[type='text']").val("");
+                        $("#rgtask_fm textarea").text("");
+                        $("#rgtask_fm input[type='date']").val("");
+                        $("#rgtask_fm input[type='number']").val("");
                         $("#startdate").removeAttr("disabled");
                         $("#updateRgtask_smt").text("提交");
                         $("#rgtaskEditModal").modal('show');
                     });
-                    $("#updateRgtask_smt").click(function () {
-                        if ($("#rgtaskModalTitle").html() == "新增任务") {
-                            var str_data1 = $("#rgtask_fm input").map(function () {
-                                return ($(this).attr("name") + '=' + $(this).val());
-                            }).get().join("&");
-                            var str_data2 = $("#rgtask_fm textarea").map(function () {
-                                return ($(this).attr("name") + '=' + $(this).val());
-                            }).get().join("&");
-                            var str_data = str_data1 + '&' + str_data2;
-                            $.ajax({
-                                type: "POST",
-                                url: "/profile/rgtask",
-                                data: str_data,
-                                success: function (msg) {
-                                    $("#rgtaskEditModal").modal('hide');
-                                    loadRgtaskUl();
-                                }
-                            });
-                        }
-                        else if ($("#rgtaskModalTitle").html() == "任务详情") {
-                            var str_data1 = $("#rgtask_fm input").map(function () {
-                                return ($(this).attr("name") + '=' + $(this).val());
-                            }).get().join("&");
-                            var str_data2 = $("#rgtask_fm textarea").map(function () {
-                                return ($(this).attr("name") + '=' + $(this).val());
-                            }).get().join("&");
-                            var str_data3 = "_method=PUT";
-                            var str_data = str_data1 + '&' + str_data2 + '&' + str_data3;
-                            alert(str_data);
-                            var id = $("#rgtaskEditId").val();
-                            $.ajax({
-                                type: "POST",
-                                url: "/profile/rgtask/" + id.toString(),
-                                data: str_data,
-                                success: function (msg) {
-                                    $("#rgtaskEditModal").modal('hide');
-                                    loadRgtaskUl();
-                                }
-                            });
-                        }
-                    })
                 })
             </script>
             <div class="panel panel-default">
@@ -357,77 +319,6 @@
                 })
             </script>
         </div>
-    </div>
-    <!-- 模态框（Modal）RgtaskEditModal -->
-    <div class="modal fade" id="rgtaskEditModal" tabindex="-1" role="dialog"
-         aria-labelledby="myModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close"
-                            data-dismiss="modal" aria-hidden="true">
-                        &times;
-                    </button>
-                    <h4 class="modal-title" id="rgtaskModalTitle">
-                    </h4>
-                </div>
-                <div class="modal-body">
-                    <div id="rgtask_fm" class="form-horizontal">
-                        {{ csrf_field() }}
-                        <input type="hidden" id="rgtaskEditId"/>
-                        <div class="form-group">
-                            <label for="tasktitle" class="col-sm-2 col-sm-offset-1 control-label">任务名称</label>
-                            <div class="col-sm-6">
-                                <input type="text" class="form-control" id="tasktitle" name="title">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="taskdesc" class="col-sm-2 col-sm-offset-1 col-xs-12 control-label">任务描述</label>
-                            <div class="col-sm-7">
-                                <textarea class="form-control" id="taskdesc" name="description"></textarea>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="startdate" class="col-sm-2 col-sm-offset-1 control-label">起始日</label>
-                            <div class="col-sm-6">
-                                <input type="date" class="form-control" id="startdate" name="startdate">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="period" class="col-sm-2 col-sm-offset-1 control-label">周期</label>
-                            <div class="col-sm-6">
-                                <input type="number" class="form-control" id="period" name="period" placeholder="天">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="taskday" class="col-sm-2 col-sm-offset-1 control-label">任务日</label>
-                            <div class="col-sm-6">
-                                <input type="text" class="form-control" id="taskday" name="activeday"
-                                       placeholder="请填入数字 用英文逗号分隔">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <div class="col-sm-10 col-sm-offset-1">
-                                例如：
-                                <ul>
-                                    <li>创建一个每日任务 则周期为1 任务日为1</li>
-                                    <li>创建一个任务为每周一、周三、周五 若起始日为周一 则周期为7 任务日为1,3,5</li>
-                                    <li>创建一个任务为单周周二、周四 若起始日为单周周一 则周期为14 任务日为2,4</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default"
-                            data-dismiss="modal">关闭
-                    </button>
-                    <button id="updateRgtask_smt" type="button" class="btn btn-primary">
-                        提交
-                    </button>
-                </div>
-            </div><!-- /.modal-content -->
-        </div><!-- /.modal -->
     </div>
     <!-- 模态框（Modal）signatureEditModal -->
     <div class="modal fade" id="signatureEditModal" tabindex="-1" role="dialog"
