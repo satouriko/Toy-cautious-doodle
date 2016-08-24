@@ -28,6 +28,9 @@
                     </a>
                     <ul class="dropdown-menu">
                         <li><a href="#" id="ddm_adrgtask">创建常规任务</a></li>
+                        <li><a href="#">创建临时任务</a></li>
+                        <li class="divider"></li>
+                        <li><a href="#">打卡</a></li>
                     </ul>
                 </li>
                 <li class="dropdown">
@@ -48,7 +51,8 @@
                     </a>
                     <ul class="dropdown-menu">
                         <li><a href="/profile">个人资料</a></li>
-                        <li><a href="/auth/logout">登出</a></li>
+                        <li class="divider"></li>
+                        <li><a href="/auth/logout">注销</a></li>
                     </ul>
                 </li>
             </ul>
