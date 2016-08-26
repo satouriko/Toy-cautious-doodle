@@ -32,14 +32,14 @@
     </style>
 
     <div class="container">
-        <div class="row" style="margin-top: 20px">
+        <div class="col-xs-12" style="margin-top: 20px">
             <img class="center" src="/img/0820_2.gif" alt="Cautious doodle"/>
         </div>
-        <div class="row">
+        <div class="col-xs-12">
             <h1 class="center">Whoops~</h1>
         </div>
         @if (count($errors) > 0)
-            <div class=" row col-lg-4 col-lg-offset-4 col-sm-6 col-sm-offset-3 col-xs-8 col-xs-offset-2">
+            <div class="col-lg-4 col-lg-offset-4 col-sm-6 col-sm-offset-3 col-xs-12">
                 @foreach ($errors->all() as $error)
                     <div class="alert alert-warning">
                         <a href="#" class="close" data-dismiss="alert">
@@ -51,7 +51,7 @@
             </div>
 
         @endif
-        <div class="loginpanel row col-lg-4 col-lg-offset-4 col-sm-6 col-sm-offset-3 col-xs-8 col-xs-offset-2">
+        <div class="loginpanel col-lg-4 col-lg-offset-4 col-sm-6 col-sm-offset-3 col-xs-12">
             <form method="POST" action="/password/email" class="form-horizontal">
                 {!! csrf_field() !!}
 
