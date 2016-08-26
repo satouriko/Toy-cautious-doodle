@@ -24,6 +24,9 @@ Route::resource('profile/signature', 'Profile\SignatureController',
 Route::resource('task/rgtask', 'Task\RegularTaskController',
     ['only' => ['index', 'store', 'update', 'destroy']]);
 
+Route::resource('task/tasksign', 'Task\TaskSignController',
+    ['only' => ['index', 'create', 'store']]);
+
 // 认证路由...
 Route::get('auth/login', 'Auth\AuthController@getLogin');
 Route::post('auth/login', 'Auth\AuthController@postLogin');
