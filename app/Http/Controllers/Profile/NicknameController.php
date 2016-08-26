@@ -26,7 +26,7 @@ class NicknameController extends Controller
     {
         $uid = $request->user()['id'];
         $Nicknames = Nickname::where('uid', $uid)->get();
-        $data_str = json_encode($Nicknames);
+        $data_str = $Nicknames->toJson();
         return $data_str;
     }
 

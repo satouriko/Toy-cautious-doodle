@@ -39,6 +39,7 @@ class TaskSignController extends Controller
             $signed = true;
         } else {
             $signed = false;
+            //按任务（！不是按表头）计算出今日任务
         }
         return json_encode($signed);
     }
@@ -59,8 +60,7 @@ class TaskSignController extends Controller
 
         $tasksignheader = Tasksignheader::where('uid', $uid)
             ->orderBy('begindate', 'desc')
-            ->take(1)
-            ->get();
+            ->first();
 
         foreach ($ids as $looper => $task_id) {
 
@@ -71,7 +71,7 @@ class TaskSignController extends Controller
             $tasksign->grade = $grades[$looper];
             $tasksign->reason = $reasons[$looper];
             $tasksign->comment = $comments[$looper];
-            $tasksign->tasksignheader_id = $tasksignheader[0]['id'];
+            $tasksign->tasksignheader_id = $tasksignheader['id'];
 
             $tasksign->save();
         }

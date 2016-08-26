@@ -25,7 +25,7 @@ class SignatureController extends Controller
     {
         $uid = $request->user()['id'];
         $Signatures = Signature::where('uid', $uid)->get();
-        $data_str = json_encode($Signatures);
+        $data_str = $Signatures->toJson();
         return $data_str;
     }
 

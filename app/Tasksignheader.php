@@ -15,4 +15,6 @@ class Tasksignheader extends Model
     {
         return $this->hasMany('App\Tasksign');
     }
+
+    protected $fillable = ['uid', 'begindate'];
 }
