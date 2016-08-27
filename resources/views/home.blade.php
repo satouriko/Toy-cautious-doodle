@@ -53,7 +53,7 @@
                     打卡记录
                 </h3>
             </div>
-            <div id="tasksign_ul" class="panel-body">
+            <div id="tasksign_ul" class="panel-body table-responsive">
                 <table class="form-horizontal center">
                     <tbody></tbody>
                     <tfoot>

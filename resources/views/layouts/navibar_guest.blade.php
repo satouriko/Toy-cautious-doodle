@@ -23,7 +23,7 @@
                 <a class="navbar-brand" href="/">Toy Cautious Doodle</a>
             </div>
             <div>
-                <ul class="nav navbar-nav navbar-top-links navbar-right">
+                <ul class="nav navbar-nav navbar-right">
                     <li>
                         <form class="form-inline form-nav" method="POST" action="/auth/login">
                             {!! csrf_field() !!}
