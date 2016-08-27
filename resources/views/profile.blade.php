@@ -152,7 +152,7 @@
                         <tbody id="rgtask_ul"></tbody>
                         <tfoot>
                         <tr>
-                            <td class="table-control" colspan="3">
+                            <td class="table-control" colspan="4">
                                 <input class="btn btn-primary expand" type="button" id="rgtask_smt" value="添加一个任务"/>
                             </td>
                         </tr>
@@ -169,7 +169,7 @@
                             $("#rgtask_ul").empty();
                             var dataObj = eval("(" + msg + ")");
                             for (i in dataObj) {
-                                $("#rgtask_ul").append("<tr><td class='expand table-control table-text'>" + dataObj[i].title + '</td><td class="table-control"><input class="btn btn-primary" type="button" value="详情" onclick="showRgtaskEdit(' + dataObj[i].id + ')"/></td><td class="table-control" id="rgtask_del_id_' + dataObj[i].id + '">{{ csrf_field() }} {{ method_field("DELETE") }}<input class="btn btn-danger" type="button" onclick="delRgtaskLi(' + dataObj[i].id + ')" value="删除" /></td></tr>');
+                                $("#rgtask_ul").append("<tr><td class='expand table-control table-text'>" + dataObj[i].title + '</td><td class="table-control"><input class="btn btn-primary" type="button" value="详情" onclick="showRgtaskEdit(' + dataObj[i].id + ')"/></td><td><input class="btn btn-info" type="button" value="已经坚持'+ dataObj[i].day_cnt +'天" /></td><td class="table-control" id="rgtask_del_id_' + dataObj[i].id + '">{{ csrf_field() }} {{ method_field("DELETE") }}<input class="btn btn-danger" type="button" onclick="delRgtaskLi(' + dataObj[i].id + ')" value="删除" /></td></tr>');
                             }
                         }
                     });

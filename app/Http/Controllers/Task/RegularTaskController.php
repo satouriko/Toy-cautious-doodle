@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Task;
 
 use App\Task;
+use App\Tasksign;
 use App\Tasksignheader;
 use App\Tasksignheadertask;
 use Illuminate\Http\Request;
@@ -26,6 +27,11 @@ class RegularTaskController extends Controller
     {
         $uid = $request->user()['id'];
         $Tasks = Task::where('uid', $uid)->where('temporary', false)->where('valid', true)->get();
+        foreach ($Tasks as $task)
+        {
+            $day_cnt = Tasksign::where('task_id', $task->id)->where('grade','Checked')->count();
+            $task->day_cnt = $day_cnt;
+        }
         $data_str = $Tasks->toJson();
         return $data_str;
     }
