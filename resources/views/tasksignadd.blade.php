@@ -84,7 +84,7 @@
                                     <label class="btn btn-warning">
                                         <input type="radio" name="grade[{{ $task->id }}]" value="Delayed"/> 因故推迟
                                     </label>
-                                    <label class="btn btn-info">
+                                    <label class="btn btn-warning">
                                         <input type="radio" name="grade[{{ $task->id }}]" value="Cancelled"/> 取消
                                     </label>
                                 </div>

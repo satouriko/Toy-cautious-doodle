@@ -90,23 +90,28 @@
                                     if (dataObj[i].tasksigns[day_loop][tasksign_loop].task_id == dataObj[i].header[j].task_id) {
                                         append_str += '<td>';
                                         append_str += '<button class="btn expand ';
-                                        switch (dataObj[i].tasksigns[day_loop][tasksign_loop].grade) {
-                                            case "Checked":
-                                                append_str += 'btn-success';
-                                                break;
-                                            case "Unchecked":
-                                                append_str += 'btn-danger';
-                                                break;
-                                            case "Delayed":
-                                                append_str += 'btn-warning';
-                                                break;
-                                            case "Cancelled":
-                                                append_str += 'btn-info';
-                                                break;
+                                        if (dataObj[i].tasksigns[day_loop][tasksign_loop].grade != 'Pending') {
+                                            switch (dataObj[i].tasksigns[day_loop][tasksign_loop].grade) {
+                                                case "Checked":
+                                                    append_str += 'btn-success';
+                                                    break;
+                                                case "Unchecked":
+                                                    append_str += 'btn-danger';
+                                                    break;
+                                                case "Delayed":
+                                                    append_str += 'btn-warning';
+                                                    break;
+                                                case "Cancelled":
+                                                    append_str += 'btn-warning';
+                                                    break;
+                                            }
+                                            append_str += '" onclick="showDetails(\'' + dataObj[i].tasksigns[day_loop][tasksign_loop].reason + '\',\'' + dataObj[i].tasksigns[day_loop][tasksign_loop].comment + '\')">';
                                         }
-                                        append_str += '" onclick="showDetails(\'' + dataObj[i].tasksigns[day_loop][tasksign_loop].reason + '\',\'' + dataObj[i].tasksigns[day_loop][tasksign_loop].comment + '\')">';
+                                        else {
+                                            append_str += 'btn-info">'
+                                        }
                                         append_str += dataObj[i].tasksigns[day_loop][tasksign_loop].grade;
-                                        append_str += '</button>'
+                                        append_str += '</button>';
                                         append_str += '</td>';
                                         flag = true;
                                         break;
