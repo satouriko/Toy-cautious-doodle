@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Task;
 use App\Task;
 use App\Tasksign;
 use App\Tasksignheader;
+use App\Tasksignheadertask;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
@@ -23,9 +24,39 @@ class TaskSignController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $uid = $request->user()['id'];
+        $headers = Tasksignheader::where('uid', $uid)
+            ->orderBy('begindate', 'desc')
+            ->get();
+        $ret = array();
+        foreach ($headers as $header) {
+            $ret_header = array();
+            $tsheader_tasks = Tasksignheadertask::where('tasksignheader_id', $header->id)
+                ->orderBy('task_id', 'asc')
+                ->with('task')
+                ->get();
+            $ret_header['header'] = $tsheader_tasks;
+            $begindate = date_create($header->begindate);
+            if ($header->enddate == '0000-00-00')
+                $enddate = date_create(date('Y-m-d'));
+            else
+                $enddate = date_create($header->enddate);
+            $tasksigns = array();
+            while (date_diff($begindate, $enddate)->format("%d") != 0) {
+                $tasksigns_day = Tasksign::where('tasksignheader_id', $header->id)
+                    ->where('date', $enddate)
+                    ->orderBy('task_id', 'asc')
+                    ->get();
+                $tasksigns[$enddate->format('Y-m-d')] = $tasksigns_day;
+                date_modify($enddate, "-1 day");
+            }
+            $ret_header['tasksigns'] = $tasksigns;
+            array_push($ret, $ret_header);
+        }
+
+        return json_encode($ret);
     }
 
     public function check(Request $request)
@@ -57,8 +88,7 @@ class TaskSignController extends Controller
             ->count();
         if ($sign_today_cnt > 0)
             return redirect('/');
-        else
-        {
+        else {
             $user = $request->user()['email'];
             //按任务（！不是按表头）计算出今日任务
             $rgtasks_all = Task::where('uid', $uid)->where('temporary', false)->where('valid', true)->get();
