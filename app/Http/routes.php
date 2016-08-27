@@ -27,6 +27,8 @@ Route::resource('task/rgtask', 'Task\RegularTaskController',
 Route::resource('task/tasksign', 'Task\TaskSignController',
     ['only' => ['index', 'create', 'store']]);
 
+Route::get('task/tasksign/check', 'Task\TaskSignController@check');
+
 // 认证路由...
 Route::get('auth/login', 'Auth\AuthController@getLogin');
 Route::post('auth/login', 'Auth\AuthController@postLogin');

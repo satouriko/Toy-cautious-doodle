@@ -10,52 +10,67 @@
             padding-bottom: 7.5px;
             padding-right: 7.5px
         }
+
         .navbar-top-links {
-            margin-right:10px;
+            margin-right: 10px;
         }
+
+        .center {
+            width: auto;
+            display: table;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
     </style>
     <!-- Navigation -->
     <nav class="navbar navbar-default" role="navigation">
-        <div class="navbar-header">
-            <a class="navbar-brand" href="/">Toy Cautious Doodle</a>
-        </div>
-        <div>
-            <ul class="nav navbar-nav navbar-left">
-                <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                        任务
-                        <b class="caret"></b>
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li><a href="#" id="ddm_adrgtask">创建常规任务</a></li>
-                        <li><a href="#">创建临时任务</a></li>
-                        <li class="divider"></li>
-                        <li><a href="#">打卡</a></li>
-                    </ul>
-                </li>
-                <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                        心情
-                        <b class="caret"></b>
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li><a href="#">记录一条心情</a></li>
-                    </ul>
-                </li>
-            </ul>
-            <ul class="nav navbar-nav navbar-right navbar-top-links">
-                <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                        {{ $user }}
-                        <b class="caret"></b>
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li><a href="/profile">个人资料</a></li>
-                        <li class="divider"></li>
-                        <li><a href="/auth/logout">注销</a></li>
-                    </ul>
-                </li>
-            </ul>
+        <div class="container">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="/">Toy Cautious Doodle</a>
+            </div>
+            <div>
+                <ul class="nav navbar-nav navbar-left">
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            任务
+                            <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="#" id="ddm_adrgtask">创建常规任务</a></li>
+                            <li><a href="#">创建临时任务</a></li>
+                            <li class="divider"></li>
+                            <li><a href="#" id="ddm_tasksignadd">打卡</a></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            心情
+                            <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="#">记录一条心情</a></li>
+                        </ul>
+                    </li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right navbar-top-links">
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            {{ $user }}
+                            <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="/profile">个人资料</a></li>
+                            <li class="divider"></li>
+                            <li><a href="/auth/logout">注销</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
         </div>
     </nav>
     <script>
@@ -69,6 +84,20 @@
                 $("#startdate").removeAttr("disabled");
                 $("#updateRgtask_smt").text("提交");
                 $("#rgtaskEditModal").modal('show');
+            });
+            $("#ddm_tasksignadd").click(function () {
+                $.ajax({
+                    type: "GET",
+                    url: "/task/tasksign/check",
+                    success: function (msg) {
+                        if (msg == "signed") {
+                            $("#tasksignAddModal").modal('show');
+                        }
+                        else {
+                            location.href = "/task/tasksign/create";
+                        }
+                    }
+                });
             });
             $("#updateRgtask_smt").click(function () {
                 if ($("#rgtaskModalTitle").html() == "新增任务") {
@@ -183,5 +212,29 @@
             </div><!-- /.modal-content -->
         </div><!-- /.modal -->
     </div>
-
+    <!-- 模态框（Modal）tasksignAddModal -->
+    <div class="modal fade" id="tasksignAddModal" tabindex="-1" role="dialog"
+         aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close"
+                            data-dismiss="modal" aria-hidden="true">
+                        &times;
+                    </button>
+                    <h4 class="modal-title" id="myModalLabel">
+                        打卡
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    <p class="center">您今天已打卡。</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default"
+                            data-dismiss="modal">关闭
+                    </button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+    </div>
 @endsection
