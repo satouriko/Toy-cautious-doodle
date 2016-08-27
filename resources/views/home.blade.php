@@ -39,6 +39,11 @@
             text-align: center;
         }
 
+        .little-table {
+            border-collapse: separate;
+            border-spacing: 2px;
+        }
+
     </style>
 
     <div class="container">
@@ -65,7 +70,34 @@
             $('#comment_p').text(comment);
             $('#showDetailModal').modal('show');
         }
+        function showTptask(id, description) {
+            $('#delTptaskId').val(id);
+            $('#description_p').text(description);
+            $('#delTptask_smt').attr('style', 'display: inline-block');
+            $('#showTptaskModal').modal('show');
+        }
+        function showTptask_nodel(description) {
+            $('#delTptaskId').val();
+            $('#description_p').text(description);
+            $('#delTptask_smt').attr('style', 'display: none');
+            $('#showTptaskModal').modal('show');
+        }
         $(document).ready(function () {
+            $("#delTptask_smt").click(function () {
+                var str_data = $("#delTptask_fm input").map(function () {
+                    return ($(this).attr("name") + '=' + $(this).val());
+                }).get().join("&");
+                var id = $('#delTptaskId').val();
+                $.ajax({
+                    type: "POST",
+                    url: "/task/tptask/" + id,
+                    data: str_data,
+                    success: function (msg) {
+                        $('#showTptaskModal').modal('hide');
+                        location.reload();
+                    }
+                });
+            });
             $.ajax({
                 type: "GET",
                 url: "/task/tasksign",
@@ -121,7 +153,52 @@
                                     append_str += '<td></td>';
                                 }
                             }
-                            append_str += '<td>假装有临时任务</td>';
+                            append_str += '<td>';
+                            for (tasksign_loop in dataObj[i].tasksigns[day_loop]) {
+                                var flag = false;
+                                for (j in dataObj[i].header) {
+                                    if (dataObj[i].tasksigns[day_loop][tasksign_loop].task_id == dataObj[i].header[j].task_id)
+                                        flag = true;
+                                }
+                                if (!flag) {
+                                    append_str += '<table class="expand little-table"><tr>';
+                                    append_str += '<td><button class="btn btn-link"';
+                                    if (dataObj[i].tasksigns[day_loop][tasksign_loop].grade != 'Pending') {
+                                        append_str += 'onclick="showTptask_nodel(\'' + dataObj[i].tasksigns[day_loop][tasksign_loop].task.description + '\')">';
+
+                                    }
+                                    else {
+                                        append_str += 'onclick="showTptask(' + dataObj[i].tasksigns[day_loop][tasksign_loop].task_id + ',\'' + dataObj[i].tasksigns[day_loop][tasksign_loop].task.description + '\')">';
+                                    }
+                                    append_str += dataObj[i].tasksigns[day_loop][tasksign_loop].task.title;
+                                    append_str += '</button></td><td>';
+                                    append_str += '<button class="btn expand ';
+                                    if (dataObj[i].tasksigns[day_loop][tasksign_loop].grade != 'Pending') {
+                                        switch (dataObj[i].tasksigns[day_loop][tasksign_loop].grade) {
+                                            case "Checked":
+                                                append_str += 'btn-success';
+                                                break;
+                                            case "Unchecked":
+                                                append_str += 'btn-danger';
+                                                break;
+                                            case "Delayed":
+                                                append_str += 'btn-warning';
+                                                break;
+                                            case "Cancelled":
+                                                append_str += 'btn-warning';
+                                                break;
+                                        }
+                                        append_str += '" onclick="showDetails(\'' + dataObj[i].tasksigns[day_loop][tasksign_loop].reason + '\',\'' + dataObj[i].tasksigns[day_loop][tasksign_loop].comment + '\')">';
+                                    }
+                                    else {
+                                        append_str += 'btn-info">'
+                                    }
+                                    append_str += dataObj[i].tasksigns[day_loop][tasksign_loop].grade;
+                                    append_str += '</button>';
+                                    append_str += '</td></tr></table>';
+                                }
+                            }
+                            append_str += '</td>';
                         }
                         append_str += '</table>';
                         $("#tasksign_ul").append(append_str);
@@ -153,6 +230,42 @@
                     </div>
                 </div>
                 <div class="modal-footer">
+                    <button type="button" class="btn btn-default"
+                            data-dismiss="modal">关闭
+                    </button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+    </div>
+    <!-- 模态框（Modal）showTptaskModal -->
+    <div class="modal fade" id="showTptaskModal" tabindex="-1" role="dialog"
+         aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close"
+                            data-dismiss="modal" aria-hidden="true">
+                        &times;
+                    </button>
+                    <h4 class="modal-title" id="myModalLabel">
+                        任务详情
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-horizontal">
+                        <label>任务描述</label>
+                        <p id="description_p"></p>
+                    </div>
+                </div>
+                <div id="delTptask_fm">
+                    {{ csrf_field() }}
+                    {{ method_field("DELETE") }}
+                    <input type="hidden" name="id" id="delTptaskId"/>
+                </div>
+                <div class="modal-footer">
+                    <button id="delTptask_smt" type="button" class="btn btn-danger">
+                        删除此任务
+                    </button>
                     <button type="button" class="btn btn-default"
                             data-dismiss="modal">关闭
                     </button>

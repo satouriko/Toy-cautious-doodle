@@ -42,7 +42,7 @@
                         </a>
                         <ul class="dropdown-menu">
                             <li><a href="#" id="ddm_adrgtask">创建常规任务</a></li>
-                            <li><a href="#">创建临时任务</a></li>
+                            <li><a href="#" id="ddm_adtptask">创建临时任务</a></li>
                             <li class="divider"></li>
                             <li><a href="#" id="ddm_tasksignadd">打卡</a></li>
                         </ul>
@@ -85,6 +85,14 @@
                 $("#updateRgtask_smt").text("提交");
                 $("#rgtaskEditModal").modal('show');
             });
+            $("#ddm_adtptask").click(function () {
+                $("#tptaskModalTitle").html("新增任务");
+                $("#tptask_fm input[type='text']").val("");
+                $("#tptask_fm textarea").val("");
+                $("#tptask_fm input[type='date']").val("");
+                $("#updateTptask_smt").text("提交");
+                $("#tptaskEditModal").modal('show');
+            });
             $("#ddm_tasksignadd").click(function () {
                 $.ajax({
                     type: "GET",
@@ -114,7 +122,8 @@
                         data: str_data,
                         success: function (msg) {
                             $("#rgtaskEditModal").modal('hide');
-                            loadRgtaskUl();
+                            //loadRgtaskUl();
+                            location.reload();
                         }
                     });
                 }
@@ -138,6 +147,38 @@
                         }
                     });
                 }
+            });
+            $("#updateTptask_smt").click(function () {
+                var str_data1 = $("#tptask_fm input").map(function () {
+                    return ($(this).attr("name") + '=' + $(this).val());
+                }).get().join("&");
+                var str_data2 = $("#tptask_fm textarea").map(function () {
+                    return ($(this).attr("name") + '=' + $(this).val());
+                }).get().join("&");
+                var str_data = str_data1 + '&' + str_data2;
+                $.ajax({
+                    type: "POST",
+                    url: "/task/tptask",
+                    data: str_data,
+                    success: function (msg) {
+                        $("#tptaskEditModal").modal('hide');
+                        location.reload();
+                    }
+                });
+            });
+            $("#delTasksign_smt").click(function () {
+                var str_data = $("#delTasksign_fm input").map(function () {
+                    return ($(this).attr("name") + '=' + $(this).val());
+                }).get().join("&");
+                $.ajax({
+                    type: "POST",
+                    url: "/task/tasksign/reset",
+                    data: str_data,
+                    success: function (msg) {
+                        $("#tasksignAddModal").modal('hide');
+                        location.reload();
+                    }
+                });
             });
         })
     </script>
@@ -212,6 +253,54 @@
             </div><!-- /.modal-content -->
         </div><!-- /.modal -->
     </div>
+    <!-- 模态框（Modal）TptaskEditModal -->
+    <div class="modal fade" id="tptaskEditModal" tabindex="-1" role="dialog"
+         aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close"
+                            data-dismiss="modal" aria-hidden="true">
+                        &times;
+                    </button>
+                    <h4 class="modal-title" id="tptaskModalTitle">
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    <div id="tptask_fm" class="form-horizontal">
+                        {{ csrf_field() }}
+                        <div class="form-group">
+                            <label for="tp_tasktitle" class="col-sm-2 col-sm-offset-1 control-label">任务名称</label>
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control" id="tp_tasktitle" name="title">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="tp_taskdesc"
+                                   class="col-sm-2 col-sm-offset-1 col-xs-12 control-label">任务描述</label>
+                            <div class="col-sm-7">
+                                <textarea class="form-control" id="tp_taskdesc" name="description"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="tp_startdate" class="col-sm-2 col-sm-offset-1 control-label">任务日</label>
+                            <div class="col-sm-6">
+                                <input type="date" class="form-control" id="tp_startdate" name="startdate">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default"
+                            data-dismiss="modal">关闭
+                    </button>
+                    <button id="updateTptask_smt" type="button" class="btn btn-primary">
+                        提交
+                    </button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+    </div>
     <!-- 模态框（Modal）tasksignAddModal -->
     <div class="modal fade" id="tasksignAddModal" tabindex="-1" role="dialog"
          aria-labelledby="myModalLabel" aria-hidden="true">
@@ -228,8 +317,14 @@
                 </div>
                 <div class="modal-body">
                     <p class="center">您今天已打卡。</p>
+                    <div id="delTasksign_fm">
+                        {{ csrf_field() }}
+                    </div>
                 </div>
                 <div class="modal-footer">
+                    <button id="delTasksign_smt" type="button" class="btn btn-danger">
+                        撤销今天打卡
+                    </button>
                     <button type="button" class="btn btn-default"
                             data-dismiss="modal">关闭
                     </button>

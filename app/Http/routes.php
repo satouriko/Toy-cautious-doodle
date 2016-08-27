@@ -24,10 +24,15 @@ Route::resource('profile/signature', 'Profile\SignatureController',
 Route::resource('task/rgtask', 'Task\RegularTaskController',
     ['only' => ['index', 'store', 'update', 'destroy']]);
 
+Route::resource('task/tptask', 'Task\TemporaryTaskController',
+    ['only' => ['index', 'store', 'destroy']]);
+
 Route::resource('task/tasksign', 'Task\TaskSignController',
     ['only' => ['index', 'create', 'store']]);
 
 Route::get('task/tasksign/check', 'Task\TaskSignController@check');
+
+Route::post('task/tasksign/reset', 'Task\TaskSignController@reset');
 
 // 认证路由...
 Route::get('auth/login', 'Auth\AuthController@getLogin');

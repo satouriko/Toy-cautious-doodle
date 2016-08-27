@@ -57,6 +57,7 @@ class TaskSignController extends Controller
                     $tasksigns_day = Tasksign::where('tasksignheader_id', $header->id)
                         ->where('date', $enddate)
                         ->orderBy('task_id', 'asc')
+                        ->with('task')
                         ->get();
                 else {
                     $tasksigns_day = array();
@@ -72,10 +73,13 @@ class TaskSignController extends Controller
                             array_push($tasksigns_day, $tasksign_day_fake);
                         }
                     }
-                    $tptasks = Task::where('uid', $uid)->where('temporary', true)->where('startdate', date('Y-m-d'))->get();
+                    $tptasks = Task::where('uid', $uid)->where('temporary', true)->where('startdate', $enddate)->get();
                     foreach ($tptasks as $tptask) {
                         $tasksign_day_fake['task_id'] = $tptask->id;
                         $tasksign_day_fake['grade'] = "Pending";
+                        $task_fake['title'] = $tptask->title;
+                        $task_fake['description'] = $tptask->description;
+                        $tasksign_day_fake['task'] = $task_fake;
                         array_push($tasksigns_day, $tasksign_day_fake);
                     }
                 }
@@ -134,9 +138,11 @@ class TaskSignController extends Controller
                 }
 
             }
-            $tptasks = Task::where('uid', $uid)->where('temporary', true)->where('startdate', date('Y-m-d'))->get()
-                ->toArray();
-            $tasks = array_merge($rgtasks, $tptasks);
+            $tptasks = Task::where('uid', $uid)->where('temporary', true)->where('startdate', date('Y-m-d'))->get();
+            $tasks = $rgtasks;
+            foreach ($tptasks as $tptask) {
+                array_push($tasks, $tptask);
+            }
             //return json_encode($tasks);
             return view("tasksignadd", ['user' => $user, 'tasks' => $tasks]);
         }
@@ -175,6 +181,16 @@ class TaskSignController extends Controller
 
         return redirect('/');
 
+    }
+
+    public function reset(Request $request)
+    {
+        $uid = $request->user()['id'];
+        Tasksign::where('date', date('Y-m-d'))
+            ->whereHas('task', function ($query) use ($uid) {
+                $query->where('uid', $uid);
+            })
+            ->delete();
     }
 
 }
