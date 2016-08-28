@@ -66,17 +66,21 @@
 
     <script>
         function showDetails(reason, comment) {
+            reason = decodeURI(reason);
+            comment = decodeURI(comment);
             $('#reason_p').text(reason);
             $('#comment_p').text(comment);
             $('#showDetailModal').modal('show');
         }
         function showTptask(id, description) {
+            description = decodeURI(description);
             $('#delTptaskId').val(id);
             $('#description_p').text(description);
             $('#delTptask_smt').attr('style', 'display: inline-block');
             $('#showTptaskModal').modal('show');
         }
         function showTptask_nodel(description) {
+            description = decodeURI(description);
             $('#delTptaskId').val();
             $('#description_p').text(description);
             $('#delTptask_smt').attr('style', 'display: none');
@@ -137,7 +141,7 @@
                                                     append_str += 'btn-warning';
                                                     break;
                                             }
-                                            append_str += '" onclick="showDetails(\'' + dataObj[i].tasksigns[day_loop][tasksign_loop].reason + '\',\'' + dataObj[i].tasksigns[day_loop][tasksign_loop].comment + '\')">';
+                                            append_str += '" onclick="showDetails(\'' + encodeURI(dataObj[i].tasksigns[day_loop][tasksign_loop].reason) + '\',\'' + encodeURI(dataObj[i].tasksigns[day_loop][tasksign_loop].comment) + '\')">';
                                         }
                                         else {
                                             append_str += 'btn-info">'
@@ -164,11 +168,11 @@
                                     append_str += '<table class="expand little-table"><tr>';
                                     append_str += '<td><button class="btn btn-link"';
                                     if (dataObj[i].tasksigns[day_loop][tasksign_loop].grade != 'Pending') {
-                                        append_str += 'onclick="showTptask_nodel(\'' + dataObj[i].tasksigns[day_loop][tasksign_loop].task.description + '\')">';
+                                        append_str += 'onclick="showTptask_nodel(\'' + encodeURI(dataObj[i].tasksigns[day_loop][tasksign_loop].task.description) + '\')">';
 
                                     }
                                     else {
-                                        append_str += 'onclick="showTptask(' + dataObj[i].tasksigns[day_loop][tasksign_loop].task_id + ',\'' + dataObj[i].tasksigns[day_loop][tasksign_loop].task.description + '\')">';
+                                        append_str += 'onclick="showTptask(' + dataObj[i].tasksigns[day_loop][tasksign_loop].task_id + ',\'' + encodeURI(dataObj[i].tasksigns[day_loop][tasksign_loop].task.description) + '\')">';
                                     }
                                     append_str += dataObj[i].tasksigns[day_loop][tasksign_loop].task.title;
                                     append_str += '</button></td><td>';
@@ -188,7 +192,7 @@
                                                 append_str += 'btn-warning';
                                                 break;
                                         }
-                                        append_str += '" onclick="showDetails(\'' + dataObj[i].tasksigns[day_loop][tasksign_loop].reason + '\',\'' + dataObj[i].tasksigns[day_loop][tasksign_loop].comment + '\')">';
+                                        append_str += '" onclick="showDetails(\'' + encodeURI(dataObj[i].tasksigns[day_loop][tasksign_loop].reason) + '\',\'' + encodeURI(dataObj[i].tasksigns[day_loop][tasksign_loop].comment) + '\')">';
                                     }
                                     else {
                                         append_str += 'btn-info">'

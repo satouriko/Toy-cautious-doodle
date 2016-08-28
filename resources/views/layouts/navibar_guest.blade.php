@@ -23,6 +23,13 @@
                 <a class="navbar-brand" href="/">Toy Cautious Doodle</a>
             </div>
             <div>
+                <ul class="nav navbar-nav navbar-left">
+                    <li class="dropdown">
+                        <a href="/about">
+                            关于
+                        </a>
+                    </li>
+                </ul>
                 <ul class="nav navbar-nav navbar-right">
                     <li>
                         <form class="form-inline form-nav" method="POST" action="/auth/login">

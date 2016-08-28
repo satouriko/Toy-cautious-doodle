@@ -13,6 +13,8 @@
 
 Route::get('/', 'HomeController@index');
 
+Route::get('about', 'AboutController@index');
+
 Route::get('profile', 'ProfileController@index');
 
 Route::resource('profile/nickname', 'Profile\NicknameController',
