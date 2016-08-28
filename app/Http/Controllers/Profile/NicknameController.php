@@ -40,7 +40,7 @@ class NicknameController extends Controller
     {
         $nickname = new Nickname;
 
-        $nickname->uid = $request->user()['id'];;
+        $nickname->uid = $request->user()['id'];
         $nickname->nickname = $request->nickname;
 
         $nickname->save();

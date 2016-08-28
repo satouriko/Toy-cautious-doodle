@@ -36,6 +36,9 @@ Route::get('task/tasksign/check', 'Task\TaskSignController@check');
 
 Route::post('task/tasksign/reset', 'Task\TaskSignController@reset');
 
+Route::resource('essay', 'EssayController',
+    ['only' => ['index', 'store']]);
+
 // 认证路由...
 Route::get('auth/login', 'Auth\AuthController@getLogin');
 Route::post('auth/login', 'Auth\AuthController@postLogin');

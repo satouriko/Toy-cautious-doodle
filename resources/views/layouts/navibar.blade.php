@@ -53,7 +53,9 @@
                             <b class="caret"></b>
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a href="#">记录一条心情</a></li>
+                            <li><a href="#" id="ddm_adessay">记录一条心情</a></li>
+                            <li class="divider"></li>
+                            <li><a href="/essay">心情板</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -106,6 +108,10 @@
                         }
                     }
                 });
+            });
+            $("#ddm_adessay").click(function () {
+                $("#updateEssay_fm textarea").val("");
+                $("#essayEditModal").modal('show');
             });
             $("#updateRgtask_smt").click(function () {
                 if ($("#rgtaskModalTitle").html() == "新增任务") {
@@ -176,6 +182,24 @@
                     data: str_data,
                     success: function (msg) {
                         $("#tasksignAddModal").modal('hide');
+                        location.reload();
+                    }
+                });
+            });
+            $("#updateEssay_smt").click(function () {
+                var str_data1 = $("#updateEssay_fm input").map(function () {
+                    return ($(this).attr("name") + '=' + $(this).val());
+                }).get().join("&");
+                var str_data2 = $("#updateEssay_fm textarea").map(function () {
+                    return ($(this).attr("name") + '=' + $(this).val());
+                }).get().join("&");
+                var str_data = str_data1 + '&' + str_data2;
+                $.ajax({
+                    type: "POST",
+                    url: "/essay",
+                    data: str_data,
+                    success: function (msg) {
+                        $("#essayEditModal").modal('hide');
                         location.reload();
                     }
                 });
@@ -327,6 +351,38 @@
                     </button>
                     <button type="button" class="btn btn-default"
                             data-dismiss="modal">关闭
+                    </button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+    </div>
+    <!-- 模态框（Modal）essayEditModal -->
+    <div class="modal fade" id="essayEditModal" tabindex="-1" role="dialog"
+         aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close"
+                            data-dismiss="modal" aria-hidden="true">
+                        &times;
+                    </button>
+                    <h4 class="modal-title" id="myModalLabel">
+                        写心情
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    <div id="updateEssay_fm" class="form-horizontal">
+                        {{ csrf_field() }}
+                        <textarea class="form-control expand" name="essaycontent" id="essayEditInput"
+                                  rows="5"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default"
+                            data-dismiss="modal">关闭
+                    </button>
+                    <button id="updateEssay_smt" type="button" class="btn btn-primary">
+                        提交
                     </button>
                 </div>
             </div><!-- /.modal-content -->
