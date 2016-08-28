@@ -23,6 +23,9 @@ Route::resource('profile/nickname', 'Profile\NicknameController',
 Route::resource('profile/signature', 'Profile\SignatureController',
     ['only' => ['index', 'store', 'update', 'destroy']]);
 
+Route::resource('profile/goal', 'Profile\GoalController',
+    ['only' => ['index', 'store', 'update']]);
+
 Route::resource('task/rgtask', 'Task\RegularTaskController',
     ['only' => ['index', 'store', 'update', 'destroy']]);
 
