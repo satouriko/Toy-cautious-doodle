@@ -49,7 +49,7 @@ class TaskSignController extends Controller
             }
 
             $tasksigns = array();
-            while (date_diff($begindate, $enddate)->format("%R%d") >= 0) {
+            while (date_diff($begindate, $enddate)->format("%R%a") >= 0) {
                 $tasksigns_day_cnt = Tasksign::where('tasksignheader_id', $header->id)
                     ->where('date', $enddate)
                     ->count();
@@ -66,21 +66,21 @@ class TaskSignController extends Controller
                         $activedays = explode(',', $rgtask_all->activeday);
                         $date_start = date_create($rgtask_all->startdate);
                         $diff = date_diff($date_start, $enddate);
-                        $diff_int = $diff->format("%R%d");
+                        $diff_int = $diff->format("%R%a");
                         if ($diff_int >= 0 && in_array($diff_int % $rgtask_all->period + 1, $activedays)) {
-                            $tasksign_day_fake['task_id'] = $rgtask_all->id;
-                            $tasksign_day_fake['grade'] = "Pending";
-                            array_push($tasksigns_day, $tasksign_day_fake);
+                            $tasksignrg_day_fake['task_id'] = $rgtask_all->id;
+                            $tasksignrg_day_fake['grade'] = "Pending";
+                            array_push($tasksigns_day, $tasksignrg_day_fake);
                         }
                     }
                     $tptasks = Task::where('uid', $uid)->where('temporary', true)->where('startdate', $enddate)->get();
                     foreach ($tptasks as $tptask) {
-                        $tasksign_day_fake['task_id'] = $tptask->id;
-                        $tasksign_day_fake['grade'] = "Pending";
+                        $tasksigntp_day_fake['task_id'] = $tptask->id;
+                        $tasksigntp_day_fake['grade'] = "Pending";
                         $task_fake['title'] = $tptask->title;
                         $task_fake['description'] = $tptask->description;
-                        $tasksign_day_fake['task'] = $task_fake;
-                        array_push($tasksigns_day, $tasksign_day_fake);
+                        $tasksigntp_day_fake['task'] = $task_fake;
+                        array_push($tasksigns_day, $tasksigntp_day_fake);
                     }
                 }
                 $tasksigns[$enddate->format('Y-m-d')] = $tasksigns_day;
@@ -132,7 +132,7 @@ class TaskSignController extends Controller
                 $date_now = date_create(date('Y-m-d'));
                 $date_start = date_create($rgtask_all->startdate);
                 $diff = date_diff($date_start, $date_now);
-                $diff_int = $diff->format("%R%d");
+                $diff_int = $diff->format("%R%a");
                 if ($diff_int >= 0 && in_array($diff_int % $rgtask_all->period + 1, $activedays)) {
                     array_push($rgtasks, $rgtask_all);
                 }
@@ -163,6 +163,7 @@ class TaskSignController extends Controller
         $uid = $request->user()['id'];
 
         $tasksignheader = Tasksignheader::where('uid', $uid)
+            ->where('begindate', '<=', date('Y-m-d'))
             ->orderBy('begindate', 'desc')
             ->first();
 

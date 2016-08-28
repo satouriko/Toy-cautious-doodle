@@ -157,7 +157,7 @@
                                     append_str += '<td></td>';
                                 }
                             }
-                            append_str += '<td>';
+                            append_str += '<td><table class="expand little-table">';
                             for (tasksign_loop in dataObj[i].tasksigns[day_loop]) {
                                 var flag = false;
                                 for (j in dataObj[i].header) {
@@ -165,7 +165,7 @@
                                         flag = true;
                                 }
                                 if (!flag) {
-                                    append_str += '<table class="expand little-table"><tr>';
+                                    append_str += '<tr>';
                                     append_str += '<td><button class="btn btn-link"';
                                     if (dataObj[i].tasksigns[day_loop][tasksign_loop].grade != 'Pending') {
                                         append_str += 'onclick="showTptask_nodel(\'' + encodeURI(dataObj[i].tasksigns[day_loop][tasksign_loop].task.description) + '\')">';
@@ -199,10 +199,10 @@
                                     }
                                     append_str += dataObj[i].tasksigns[day_loop][tasksign_loop].grade;
                                     append_str += '</button>';
-                                    append_str += '</td></tr></table>';
+                                    append_str += '</td></tr>';
                                 }
                             }
-                            append_str += '</td>';
+                            append_str += '</table></td>';
                         }
                         append_str += '</table>';
                         $("#tasksign_ul").append(append_str);

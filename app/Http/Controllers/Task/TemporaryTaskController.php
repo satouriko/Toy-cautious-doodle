@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Task;
 
 use App\Task;
+use App\Tasksignheader;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
@@ -38,6 +39,15 @@ class TemporaryTaskController extends Controller
     {
         $uid = $request->user()['id'];
         $task = new Task();
+
+        $taskheader_cnt = Tasksignheader::where('uid', $uid)->count();
+        if($taskheader_cnt == 0)
+        {
+            $header = new Tasksignheader();
+            $header->uid = $uid;
+            $header->begindate = $request->startdate;
+            $header->save();
+        }
 
         $task->uid = $uid;
         $task->startdate = $request->startdate;
