@@ -54,7 +54,7 @@ class EssayController extends Controller
         $essay = new Essay();
 
         $essay->uid = $uid;
-        $essay->time = date('Y-m-d h:i:s', time());
+        $essay->time = date('Y-m-d H:i:s', time());
         $essay->content = $request->essaycontent;
 
         $sign_today_cnt = Tasksign::where('date', date('Y-m-d'))
