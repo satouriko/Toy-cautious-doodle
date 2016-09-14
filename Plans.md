@@ -1,5 +1,18 @@
 # 计划书 PLANS - Toy Cautious Doodle
 
+## 二期计划书　Functions planed for v2.0
+
+* [ ] 任务分类
+  * [ ] 分类显示
+  * [ ] 分类属性：状态类/任务类
+* [ ] 延迟完成
+  * [ ] 任务类任务 Unchecked 自动压入次日
+  * [ ] Unchecked 后显示完成日期
+* [ ] 任务优先级
+  * [ ] 设置优先级
+  * [ ] 按优先级排序
+
+
 ##　一期计划书 Functions planed for v1.0
 
 * [x] 用户认证 Authorize
