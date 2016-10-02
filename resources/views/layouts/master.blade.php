@@ -6,7 +6,8 @@
     <link rel="stylesheet" href="{{ URL::asset('assets/css/bootstrap.min.css') }}">
 
     <!-- jQuery文件。务必在bootstrap.min.js 之前引入 -->
-    <script src="//cdn.bootcss.com/jquery/1.11.3/jquery.min.js"></script>
+    {{--<script src="//cdn.bootcss.com/jquery/1.11.3/jquery.min.js"></script>--}}
+    <script src="{{ URL::asset('assets/js/jquery.min.js') }}"></script>
 
     <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
     <script src="{{ URL::asset('assets/js/bootstrap.min.js') }}"></script>
