@@ -74,7 +74,7 @@
                         <h4 class="panel-title">
                             <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne"
                                aria-expanded="true" aria-controls="collapseOne">
-                                我的梦想/目标
+                                我的小梦想
                             </a>
                         </h4>
                     </div>
@@ -87,7 +87,7 @@
                                 <tr>
                                     <td class="table-control" colspan="4">
                                         <input class="btn btn-primary expand" type="button" id="goal_smt"
-                                               value="添加一个梦想/目标"/>
+                                               value="添加一个小梦想"/>
                                     </td>
                                 </tr>
                                 </tfoot>
@@ -100,7 +100,7 @@
                         <h4 class="panel-title">
                             <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion"
                                href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                                已完结的梦想/目标
+                                已完结的小梦想
                             </a>
                         </h4>
                     </div>
@@ -146,7 +146,7 @@
                     });
                 }
                 function showGoalEdit(id) {
-                    $("#goalModalTitle").html("梦想/目标详情");
+                    $("#goalModalTitle").html("小梦想详情");
                     $("#goal_fm input[type='text']").val("");
                     $("#goal_tasktitle").attr("disabled", true);
                     $("#goal_taskdesc").attr("disabled", true);
@@ -209,7 +209,7 @@
                         });
                     });
                     $("#goal_smt").click(function () {
-                        $("#goalModalTitle").html("添加梦想/目标");
+                        $("#goalModalTitle").html("添加小梦想");
                         $("#goal_fm input[type='text']").val("");
                         $("#goal_fm textarea").val("");
                         $("#goal_fm input[type='date']").val("");
@@ -720,14 +720,14 @@
                     <div id="goal_fm" class="form-horizontal">
                         {{ csrf_field() }}
                         <div class="form-group">
-                            <label for="goal_tasktitle" class="col-sm-4 control-label">梦想/目标名称</label>
+                            <label for="goal_tasktitle" class="col-sm-4 control-label">小梦想名称</label>
                             <div class="col-sm-6">
                                 <input type="text" class="form-control" id="goal_tasktitle" name="title">
                             </div>
                         </div>
                         <div class="form-group">
                             <label for="goal_taskdesc"
-                                   class="col-sm-4 col-xs-12 control-label">梦想/目标描述</label>
+                                   class="col-sm-4 col-xs-12 control-label">小梦想描述</label>
                             <div class="col-sm-6">
                                 <textarea class="form-control" id="goal_taskdesc" name="description"></textarea>
                             </div>
@@ -762,7 +762,7 @@
                         &times;
                     </button>
                     <h4 class="modal-title" id="goalDelModalTitle">
-                        完结梦想/目标
+                        完结小梦想
                     </h4>
                 </div>
                 <div class="modal-body">
