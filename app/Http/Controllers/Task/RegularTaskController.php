@@ -50,6 +50,8 @@ class RegularTaskController extends Controller
         $task->uid = $uid;
         $task->startdate = $request->startdate;
         $task->period = $request->period;
+        if($task->period == 0)
+            $task->period = 1;
         $task->activeday = $request->activeday;
         $task->temporary = false;
         $task->valid = true;
@@ -140,6 +142,8 @@ class RegularTaskController extends Controller
     {
         $task = Task::find($id);
         $task->period = $request->period;
+        if($task->period == 0)
+            $task->period = 1;
         $task->activeday = $request->activeday;
         $task->title = $request->title;
         $task->description = $request->description;
