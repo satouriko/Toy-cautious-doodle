@@ -55,6 +55,8 @@ class RegularTaskController extends Controller
         $task->valid = true;
         $task->title = $request->title;
         $task->description = $request->description;
+        $task->family_id = $request->family_id;
+        $task->type = $request->type;
 
         $task->save();
 
@@ -141,6 +143,8 @@ class RegularTaskController extends Controller
         $task->activeday = $request->activeday;
         $task->title = $request->title;
         $task->description = $request->description;
+        $task->family_id = $request->family_id;
+        $task->type = $request->type;
 
         $task->save();
     }

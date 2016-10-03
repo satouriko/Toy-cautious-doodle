@@ -78,6 +78,17 @@
     <script>
         $(document).ready(function () {
             $("#ddm_adrgtask").click(function () {
+                $.ajax({
+                    type: "GET",
+                    url: "/task/family",
+                    success: function (msg) {
+                        $("#taskfamily").empty();
+                        var dataObj = eval("(" + msg + ")");
+                        for (i in dataObj) {
+                            $("#taskfamily").append("<option value=" + dataObj[i].id + ">" + dataObj[i].title + '</option>');
+                        }
+                    }
+                });
                 $("#rgtaskModalTitle").html("新增任务");
                 $("#rgtask_fm input[type='text']").val("");
                 $("#rgtask_fm textarea").val("");
@@ -121,7 +132,10 @@
                     var str_data2 = $("#rgtask_fm textarea").map(function () {
                         return ($(this).attr("name") + '=' + $(this).val());
                     }).get().join("&");
-                    var str_data = str_data1 + '&' + str_data2;
+                    var str_data3 = $("#rgtask_fm select").map(function () {
+                        return ($(this).attr("name") + '=' + $(this).val());
+                    }).get().join("&");
+                    var str_data = str_data1 + '&' + str_data2 + '&' + str_data3;
                     $.ajax({
                         type: "POST",
                         url: "/task/rgtask",
@@ -140,8 +154,11 @@
                     var str_data2 = $("#rgtask_fm textarea").map(function () {
                         return ($(this).attr("name") + '=' + $(this).val());
                     }).get().join("&");
+                    var str_data4 = $("#rgtask_fm select").map(function () {
+                        return ($(this).attr("name") + '=' + $(this).val());
+                    }).get().join("&");
                     var str_data3 = "_method=PUT";
-                    var str_data = str_data1 + '&' + str_data2 + '&' + str_data3;
+                    var str_data = str_data1 + '&' + str_data2 + '&' + str_data3 + '&' + str_data4;
                     var id = $("#rgtaskEditId").val();
                     $.ajax({
                         type: "POST",
@@ -233,6 +250,22 @@
                             <label for="taskdesc" class="col-sm-2 col-sm-offset-1 col-xs-12 control-label">任务描述</label>
                             <div class="col-sm-7">
                                 <textarea class="form-control" id="taskdesc" name="description"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="taskfamily" class="col-sm-2 col-sm-offset-1 col-xs-12 control-label">任务分类</label>
+                            <div class="col-sm-7">
+                                <select class="form-control" id="taskfamily" name="family_id">
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="tasktype" class="col-sm-2 col-sm-offset-1 col-xs-12 control-label">任务类型</label>
+                            <div class="col-sm-7">
+                                <select class="form-control" id="tasktype" name="type">
+                                    <option value="state">状态类</option>
+                                    <option value="activity">任务类</option>
+                                </select>
                             </div>
                         </div>
                         <div class="form-group">

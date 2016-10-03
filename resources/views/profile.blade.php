@@ -330,6 +330,17 @@
                     });
                 }
                 function showRgtaskEdit(id) {
+                    $.ajax({
+                        type: "GET",
+                        url: "/task/family",
+                        success: function (msg) {
+                            $("#taskfamily").empty();
+                            var dataObj = eval("(" + msg + ")");
+                            for (i in dataObj) {
+                                $("#taskfamily").append("<option value=" + dataObj[i].id + ">" + dataObj[i].title + '</option>');
+                            }
+                        }
+                    });
                     $("#rgtaskModalTitle").html("任务详情");
                     $("#rgtask_fm input[type='text']").val("");
                     $("#rgtaskEditId").val(id);
@@ -347,6 +358,8 @@
                                     $("#startdate").val(dataObj[i].startdate);
                                     $("#period").val(dataObj[i].period);
                                     $("#taskday").val(dataObj[i].activeday);
+                                    $("#taskfamily").val(dataObj[i].family_id);
+                                    $("#tasktype").val(dataObj[i].type);
                                 }
                             }
                         }
@@ -370,6 +383,17 @@
                 $(document).ready(function () {
                     loadRgtaskUl();
                     $("#rgtask_smt").click(function () {
+                        $.ajax({
+                            type: "GET",
+                            url: "/task/family",
+                            success: function (msg) {
+                                $("#taskfamily").empty();
+                                var dataObj = eval("(" + msg + ")");
+                                for (i in dataObj) {
+                                    $("#taskfamily").append("<option value=" + dataObj[i].id + ">" + dataObj[i].title + '</option>');
+                                }
+                            }
+                        });
                         $("#rgtaskModalTitle").html("新增任务");
                         $("#rgtask_fm input[type='text']").val("");
                         $("#rgtask_fm textarea").val("");
