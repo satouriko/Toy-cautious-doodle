@@ -294,6 +294,7 @@
             </script>
 
         </div>
+
         <div class="right-section col-xs-12 col-sm-8">
             <div class="panel panel-default">
                 <div class="panel-heading">
@@ -377,6 +378,128 @@
                         $("#startdate").removeAttr("disabled");
                         $("#updateRgtask_smt").text("提交");
                         $("#rgtaskEditModal").modal('show');
+                    });
+                })
+            </script>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        任务分类
+                    </h3>
+                </div>
+                <div class="panel-body">
+                    <table class="form-horizontal center">
+                        <tbody id="family_ul"></tbody>
+                        <tfoot>
+                        <tr>
+                            <td class="table-control" colspan="4">
+                                <input class="btn btn-primary expand" type="button" id="family_smt" value="添加一个分类"/>
+                            </td>
+                        </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+            <script>
+                function loadFamilyUl() {
+                    $.ajax({
+                        type: "GET",
+                        url: "/task/family",
+                        success: function (msg) {
+                            $("#family_ul").empty();
+                            var dataObj = eval("(" + msg + ")");
+                            for (i in dataObj) {
+                                $("#family_ul").append("<tr><td class='expand table-control table-text' id='family_id_" + dataObj[i].id + "'>" + dataObj[i].title + '</td><td class="table-control"><input class="btn btn-primary" type="button" value="修改" onclick="showFamilyEdit(' + dataObj[i].id + ')"/></td><td class="table-control" id="family_del_id_' + dataObj[i].id + '">{{ csrf_field() }} {{ method_field("DELETE") }}<input class="btn btn-danger" type="button" onclick="delFamilyLi(' + dataObj[i].id + ')" value="删除" /></td></tr>');
+                            }
+                        }
+                    });
+                }
+                function showFamilyEdit(id) {
+                    $("#familyModalTitle").html("分类详情");
+                    $("#family_fm input[type='text']").val("");
+                    $("#familyEditId").val(id);
+                    $("#updateFamily_smt").text("修改");
+                    $.ajax({
+                        type: "GET",
+                        url: "/task/family",
+                        success: function (msg) {
+                            var dataObj = eval("(" + msg + ")");
+                            for (i in dataObj) {
+                                if (dataObj[i].id == id) {
+                                    $("#familytitle").val(dataObj[i].title);
+                                    $("#familydesc").val(dataObj[i].description);
+                                    $("#familydest").val(dataObj[i].destination);
+                                }
+                            }
+                        }
+                    });
+                    $("#familyEditModal").modal('show');
+                }
+                function delFamilyLi(id) {
+                    var str_query = "#family_del_id_" + id.toString() + " input";
+                    var str_data = $(str_query).map(function () {
+                        return ($(this).attr("name") + '=' + $(this).val());
+                    }).get().join("&");
+                    $.ajax({
+                        type: "POST",
+                        url: "/task/family/" + id.toString(),
+                        data: str_data,
+                        success: function (msg) {
+                            loadFamilyUl();
+                        }
+                    })
+                }
+                $(document).ready(function () {
+                    loadFamilyUl();
+                    $("#family_smt").click(function () {
+                        $("#familyModalTitle").html("添加分类");
+                        $("#family_fm input[type='text']").val("");
+                        $("#family_fm textarea").val("");
+                        $("#family_fm input[type='date']").val("");
+                        $("#family_fm input[type='number']").val("");
+                        $("#updateFamily_smt").text("提交");
+                        $("#familyEditModal").modal('show');
+                    });
+                    $("#updateFamily_smt").click(function () {
+                        if ($("#familyModalTitle").html() == "添加分类") {
+                            var str_data1 = $("#family_fm input").map(function () {
+                                return ($(this).attr("name") + '=' + $(this).val());
+                            }).get().join("&");
+                            var str_data2 = $("#family_fm textarea").map(function () {
+                                return ($(this).attr("name") + '=' + $(this).val());
+                            }).get().join("&");
+                            var str_data = str_data1 + '&' + str_data2;
+                            $.ajax({
+                                type: "POST",
+                                url: "/task/family",
+                                data: str_data,
+                                success: function (msg) {
+                                    $("#familyEditModal").modal('hide');
+                                    loadFamilyUl();
+                                    //location.reload();
+                                }
+                            });
+                        }
+                        else if ($("#familyModalTitle").html() == "分类详情") {
+                            var str_data1 = $("#family_fm input").map(function () {
+                                return ($(this).attr("name") + '=' + $(this).val());
+                            }).get().join("&");
+                            var str_data2 = $("#family_fm textarea").map(function () {
+                                return ($(this).attr("name") + '=' + $(this).val());
+                            }).get().join("&");
+                            var str_data3 = "_method=PUT";
+                            var str_data = str_data1 + '&' + str_data2 + '&' + str_data3;
+                            var id = $("#familyEditId").val();
+                            $.ajax({
+                                type: "POST",
+                                url: "/task/family/" + id.toString(),
+                                data: str_data,
+                                success: function (msg) {
+                                    $("#familyEditModal").modal('hide');
+                                    loadFamilyUl();
+                                }
+                            });
+                        }
                     });
                 })
             </script>
@@ -473,6 +596,54 @@
                 })
             </script>
         </div>
+    </div>
+    <!-- 模态框（Modal）FamilyEditModal -->
+    <div class="modal fade" id="familyEditModal" tabindex="-1" role="dialog"
+         aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close"
+                            data-dismiss="modal" aria-hidden="true">
+                        &times;
+                    </button>
+                    <h4 class="modal-title" id="familyModalTitle">
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    <div id="family_fm" class="form-horizontal">
+                        {{ csrf_field() }}
+                        <input type="hidden" id="familyEditId"/>
+                        <div class="form-group">
+                            <label for="familytitle" class="col-sm-2 col-sm-offset-1 control-label">分类名称</label>
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control" id="familytitle" name="title">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="familydesc" class="col-sm-2 col-sm-offset-1 col-xs-12 control-label">分类描述</label>
+                            <div class="col-sm-7">
+                                <textarea class="form-control" id="familydesc" name="description"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="familydest" class="col-sm-2 col-sm-offset-1 col-xs-12 control-label">分类目标</label>
+                            <div class="col-sm-7">
+                                <textarea class="form-control" id="familydest" name="destination"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default"
+                            data-dismiss="modal">关闭
+                    </button>
+                    <button id="updateFamily_smt" type="button" class="btn btn-primary">
+                        提交
+                    </button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
     </div>
     <!-- 模态框（Modal）signatureEditModal -->
     <div class="modal fade" id="signatureEditModal" tabindex="-1" role="dialog"
