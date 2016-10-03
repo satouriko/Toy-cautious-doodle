@@ -60,6 +60,7 @@ class TaskSignController extends Controller
             ->orderBy('begindate', 'desc')
             ->get();
         $ret = array();
+        $ret_header_temp = array('header' => array(), 'tasksign' => array()); //一级缓存
         foreach ($headers as $header) {
             if ($header->begindate == $header->enddate)
                 continue;
@@ -95,23 +96,34 @@ class TaskSignController extends Controller
                         ->get();
                     $tasksigns[$enddate->format('Y-m-d')] = $tasksigns_day;
                 }
+                else if($enddate == date_create(date('Y-m-d'))) {
+                    $ogtasks = Ongoingtask::whereHas('task', function ($query) use ($uid) {
+                        $query->where('uid', $uid);
+                    })->with('task')->get();
+                    foreach ($ogtasks as $ogtask) {
+                        $ogtask->grade = "Pending";
+                    }
+                    $tasksigns[date('Y-m-d', time())] = $ogtasks;
+                }
                 date_modify($enddate, "-1 day");
             }
-            $tasksigns_today_cnt = Tasksign::where('tasksignheader_id', $header->id)
-                ->where('date', date('Y-m-d', time()))
-                ->count();
-            if($tasksigns_today_cnt == 0) {
-                $ogtasks = Ongoingtask::whereHas('task', function ($query) use ($uid) {
-                    $query->where('uid', $uid);
-                })->with('task')->get();
-                foreach ($ogtasks as $ogtask) {
-                    $ogtask->grade = "Pending";
-                }
-                $tasksigns[date('Y-m-d', time())] = $ogtasks;
-            }
+
             $ret_header['tasksigns'] = $tasksigns;
-            array_push($ret, $ret_header);
+
+            //智能合并表头
+            if($ret_header['header'] != $ret_header_temp['header']) {
+                if($ret_header_temp['header'] != null)
+                    array_push($ret, $ret_header_temp);
+                $ret_header_temp = $ret_header;
+            }
+            else {
+                foreach ($ret_header['tasksigns'] as $key => $tasksign) {
+                    $ret_header_temp['tasksigns'][$key] = $tasksign;
+                }
+            }
         }
+        if($ret_header_temp['header'] != null)
+            array_push($ret, $ret_header_temp);
 
         return json_encode($ret);
     }

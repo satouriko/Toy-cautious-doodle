@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\Task;
+use App\Tasksignheadertask;
 
 class OngoingTaskController extends Controller
 {
@@ -93,8 +94,10 @@ class OngoingTaskController extends Controller
     public function destroy($id)
     {
         $ogtask = Ongoingtask::where('id', $id)->with('task')->first();
-        if($ogtask->task->temporary)
+        if($ogtask->task->temporary) {
+            Tasksignheadertask::where('task_id', $ogtask->task_id)->delete();
             Task::destroy($ogtask->task_id);
+        }
         Ongoingtask::destroy($id);
     }
 }

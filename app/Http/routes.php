@@ -32,9 +32,6 @@ Route::resource('task/family', 'Task\FamilyController',
 Route::resource('task/rgtask', 'Task\RegularTaskController',
     ['only' => ['index', 'store', 'update', 'destroy']]);
 
-Route::resource('task/tptask', 'Task\TemporaryTaskController',
-    ['only' => ['index', 'store', 'destroy']]);
-
 Route::resource('task/ogtask', 'Task\OngoingTaskController',
     ['only' => ['update', 'destroy']]);
 

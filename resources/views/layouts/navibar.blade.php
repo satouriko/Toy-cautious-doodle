@@ -195,7 +195,7 @@
                 var str_data = str_data1 + '&' + str_data2 + '&' + str_data3;
                 $.ajax({
                     type: "POST",
-                    url: "/task/tptask",
+                    url: "/task/rgtask",
                     data: str_data,
                     success: function (msg) {
                         $("#tptaskEditModal").modal('hide');
@@ -254,6 +254,7 @@
                     <div id="rgtask_fm" class="form-horizontal">
                         {{ csrf_field() }}
                         <input type="hidden" id="rgtaskEditId"/>
+                        <input type="hidden" name="temporary" value=0 />
                         <div class="form-group">
                             <label for="tasktitle" class="col-sm-2 col-sm-offset-1 control-label">任务名称</label>
                             <div class="col-sm-6">
@@ -340,6 +341,7 @@
                 <div class="modal-body">
                     <div id="tptask_fm" class="form-horizontal">
                         {{ csrf_field() }}
+                        <input type="hidden" name="temporary" value=1 />
                         <div class="form-group">
                             <label for="tp_tasktitle" class="col-sm-2 col-sm-offset-1 control-label">任务名称</label>
                             <div class="col-sm-6">
