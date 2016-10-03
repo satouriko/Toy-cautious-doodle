@@ -72,18 +72,22 @@
             $('#comment_p').text(comment);
             $('#showDetailModal').modal('show');
         }
-        function showTptask(id, description) {
+        function showTptask(id, description, detail) {
             description = decodeURI(description);
             $('#delTptaskId').val(id);
             $('#description_p').text(description);
+            $('#tp_detail').val(detail);
             $('#delTptask_smt').attr('style', 'display: inline-block');
+            $('#updateOgtask_smt').attr('style', 'display: inline-block');
             $('#showTptaskModal').modal('show');
         }
-        function showTptask_nodel(description) {
+        function showTptask_nodel(description, detail) {
             description = decodeURI(description);
             $('#delTptaskId').val();
             $('#description_p').text(description);
+            $('#tp_detail').val(detail);
             $('#delTptask_smt').attr('style', 'display: none');
+            $('#updateOgtask_smt').attr('style', 'display: none');
             $('#showTptaskModal').modal('show');
         }
         $(document).ready(function () {
@@ -94,7 +98,26 @@
                 var id = $('#delTptaskId').val();
                 $.ajax({
                     type: "POST",
-                    url: "/task/tptask/" + id,
+                    url: "/task/ogtask/" + id,
+                    data: str_data,
+                    success: function (msg) {
+                        $('#showTptaskModal').modal('hide');
+                        location.reload();
+                    }
+                });
+            });
+            $("#updateOgtask_smt").click(function () {
+                var str_data1 = $("#updateOgtask_fm input").map(function () {
+                    return ($(this).attr("name") + '=' + $(this).val());
+                }).get().join("&");
+                var str_data2 = $("#updateOgtask_fm textarea").map(function () {
+                    return ($(this).attr("name") + '=' + $(this).val());
+                }).get().join("&");
+                var str_data = str_data1 + '&' + str_data2;
+                var id = $('#delTptaskId').val();
+                $.ajax({
+                    type: "POST",
+                    url: "/task/ogtask/" + id,
                     data: str_data,
                     success: function (msg) {
                         $('#showTptaskModal').modal('hide');
@@ -126,11 +149,11 @@
                                         append_str += '<tr>';
                                         append_str += '<td><button class="btn btn-link"';
                                         if (dataObj[i].tasksigns[day_loop][tasksign_loop].grade != 'Pending') {
-                                            append_str += 'onclick="showTptask_nodel(\'' + encodeURI(dataObj[i].tasksigns[day_loop][tasksign_loop].task.description) + '\')">';
+                                            append_str += 'onclick="showTptask_nodel(\'' + encodeURI(dataObj[i].tasksigns[day_loop][tasksign_loop].task.description) + '\',\'' + encodeURI(dataObj[i].tasksigns[day_loop][tasksign_loop].detail) + '\')">';
 
                                         }
                                         else {
-                                            append_str += 'onclick="showTptask(' + dataObj[i].tasksigns[day_loop][tasksign_loop].task_id + ',\'' + encodeURI(dataObj[i].tasksigns[day_loop][tasksign_loop].task.description) + '\')">';
+                                            append_str += 'onclick="showTptask(' + dataObj[i].tasksigns[day_loop][tasksign_loop].id + ',\'' + encodeURI(dataObj[i].tasksigns[day_loop][tasksign_loop].task.description) + '\',\'' + encodeURI(dataObj[i].tasksigns[day_loop][tasksign_loop].detail) + '\')">';
                                         }
                                         append_str += dataObj[i].tasksigns[day_loop][tasksign_loop].task.title;
                                         append_str += '</button></td><td>';
@@ -215,9 +238,21 @@
                     </h4>
                 </div>
                 <div class="modal-body">
-                    <div class="form-horizontal">
-                        <label>任务描述</label>
-                        <p id="description_p"></p>
+                    <div class="form-horizontal" id="updateOgtask_fm">
+                        {{ csrf_field() }}
+                        {{ method_field("PUT") }}
+                        <div class="form-group">
+                            <label class="col-sm-2 col-sm-offset-1 control-label">任务描述</label>
+                            <div class="col-sm-8">
+                                <p id="description_p"></p>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="tp_detail" class="col-sm-2 col-sm-offset-1 control-label">具体描述</label>
+                            <div class="col-sm-8">
+                                <textarea type="text" class="form-control" id="tp_detail" name="detail"></textarea>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div id="delTptask_fm">
@@ -228,6 +263,9 @@
                 <div class="modal-footer">
                     <button id="delTptask_smt" type="button" class="btn btn-danger">
                         删除此任务
+                    </button>
+                    <button id="updateOgtask_smt" type="button" class="btn btn-primary">
+                        更新
                     </button>
                     <button type="button" class="btn btn-default"
                             data-dismiss="modal">关闭

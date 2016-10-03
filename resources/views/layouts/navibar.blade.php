@@ -99,10 +99,21 @@
                 $("#rgtaskEditModal").modal('show');
             });
             $("#ddm_adtptask").click(function () {
+                $.ajax({
+                    type: "GET",
+                    url: "/task/family",
+                    success: function (msg) {
+                        $("#tp_taskfamily").empty();
+                        var dataObj = eval("(" + msg + ")");
+                        for (i in dataObj) {
+                            $("#tp_taskfamily").append("<option value=" + dataObj[i].id + ">" + dataObj[i].title + '</option>');
+                        }
+                    }
+                });
                 $("#tptaskModalTitle").html("新增任务");
                 $("#tptask_fm input[type='text']").val("");
                 $("#tptask_fm textarea").val("");
-                $("#tptask_fm input[type='date']").val("");
+                $("#tptask_fm input[type='date']").val("{{ $date_today }}");
                 $("#updateTptask_smt").text("提交");
                 $("#tptaskEditModal").modal('show');
             });
@@ -178,7 +189,10 @@
                 var str_data2 = $("#tptask_fm textarea").map(function () {
                     return ($(this).attr("name") + '=' + $(this).val());
                 }).get().join("&");
-                var str_data = str_data1 + '&' + str_data2;
+                var str_data3 = $("#tptask_fm select").map(function () {
+                    return ($(this).attr("name") + '=' + $(this).val());
+                }).get().join("&");
+                var str_data = str_data1 + '&' + str_data2 + '&' + str_data3;
                 $.ajax({
                     type: "POST",
                     url: "/task/tptask",
@@ -330,6 +344,13 @@
                             <label for="tp_tasktitle" class="col-sm-2 col-sm-offset-1 control-label">任务名称</label>
                             <div class="col-sm-6">
                                 <input type="text" class="form-control" id="tp_tasktitle" name="title">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="taskfamily" class="col-sm-2 col-sm-offset-1 col-xs-12 control-label">任务分类</label>
+                            <div class="col-sm-7">
+                                <select class="form-control" id="tp_taskfamily" name="family_id">
+                                </select>
                             </div>
                         </div>
                         <div class="form-group">

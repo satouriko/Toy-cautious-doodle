@@ -35,6 +35,9 @@ Route::resource('task/rgtask', 'Task\RegularTaskController',
 Route::resource('task/tptask', 'Task\TemporaryTaskController',
     ['only' => ['index', 'store', 'destroy']]);
 
+Route::resource('task/ogtask', 'Task\OngoingTaskController',
+    ['only' => ['update', 'destroy']]);
+
 Route::resource('task/tasksign', 'Task\TaskSignController',
     ['only' => ['index', 'create', 'store']]);
 

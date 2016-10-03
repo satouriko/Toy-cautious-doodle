@@ -54,6 +54,8 @@ class TemporaryTaskController extends Controller
         $task->temporary = true;
         $task->title = $request->title;
         $task->description = $request->description;
+        $task->family_id = $request->family_id;
+        $task->type = "activity";
 
         $task->save();
     }
