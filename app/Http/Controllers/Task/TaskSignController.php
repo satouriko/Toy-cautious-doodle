@@ -189,7 +189,8 @@ class TaskSignController extends Controller
 
             $tasksign->save();
 
-            Ongoingtask::destroy($ogtask_id);
+            if($tasksign->grade == "Checked" || $tasksign->grade == "Cancelled")
+                Ongoingtask::destroy($ogtask_id);
         }
 
         return redirect('/');

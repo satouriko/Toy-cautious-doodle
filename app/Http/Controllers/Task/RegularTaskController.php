@@ -26,7 +26,7 @@ class RegularTaskController extends Controller
     public function index(Request $request)
     {
         $uid = $request->user()['id'];
-        $Tasks = Task::where('uid', $uid)->where('temporary', false)->where('valid', true)->get();
+        $Tasks = Task::where('uid', $uid)->where('temporary', false)->where('valid', true)->with('family')->get();
         foreach ($Tasks as $task)
         {
             $day_cnt = Tasksign::where('task_id', $task->id)->where('grade','Checked')->count();

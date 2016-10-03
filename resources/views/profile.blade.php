@@ -324,7 +324,13 @@
                             $("#rgtask_ul").empty();
                             var dataObj = eval("(" + msg + ")");
                             for (i in dataObj) {
-                                $("#rgtask_ul").append("<tr><td class='expand table-control table-text'><button class='btn btn-link' onclick='showRgtaskEdit(\"" + dataObj[i].id + "\")' >" + dataObj[i].title + '</button></td><td><input class="btn btn-info" type="button" value="已经坚持' + dataObj[i].day_cnt + '天" /></td><td class="table-control" id="rgtask_del_id_' + dataObj[i].id + '">{{ csrf_field() }} {{ method_field("DELETE") }}<input class="btn btn-danger" type="button" onclick="delRgtaskLi(' + dataObj[i].id + ')" value="删除"/></td></tr>');
+                                var str = "<tr><td class='expand table-control table-text'><button class='btn btn-link' onclick='showRgtaskEdit(\"" + dataObj[i].id + "\")' >" + dataObj[i].title + '</button></td><td class="table-control"><button class="btn ';
+                                if(dataObj[i].type == "activity")
+                                    str += "btn-warning";
+                                else
+                                    str += "btn-default";
+                                str += '">' + dataObj[i].family.title + '</button></td><td class="table-control"><input class="btn btn-info" type="button" value="已经坚持' + dataObj[i].day_cnt + '天" /></td><td class="table-control" id="rgtask_del_id_' + dataObj[i].id + '">{{ csrf_field() }} {{ method_field("DELETE") }}<input class="btn btn-danger" type="button" onclick="delRgtaskLi(' + dataObj[i].id + ')" value="删除"/></td></tr>';
+                                $("#rgtask_ul").append(str);
                             }
                         }
                     });
@@ -533,6 +539,7 @@
                                 }
                             });
                         }
+                        loadRgtaskUl();
                     });
                 })
             </script>

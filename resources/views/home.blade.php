@@ -77,6 +77,7 @@
             $('#delTptaskId').val(id);
             $('#description_p').text(description);
             $('#tp_detail').val(detail);
+            $('#tp_detail').removeAttr('disabled');
             $('#delTptask_smt').attr('style', 'display: inline-block');
             $('#updateOgtask_smt').attr('style', 'display: inline-block');
             $('#showTptaskModal').modal('show');
@@ -86,6 +87,7 @@
             $('#delTptaskId').val();
             $('#description_p').text(description);
             $('#tp_detail').val(detail);
+            $('#tp_detail').attr('disabled', 'disabled');
             $('#delTptask_smt').attr('style', 'display: none');
             $('#updateOgtask_smt').attr('style', 'display: none');
             $('#showTptaskModal').modal('show');
@@ -157,6 +159,8 @@
                                         }
                                         append_str += dataObj[i].tasksigns[day_loop][tasksign_loop].task.title;
                                         append_str += '</button></td><td>';
+                                        append_str += dataObj[i].tasksigns[day_loop][tasksign_loop].detail;
+                                        append_str += '</td><td>';
                                         append_str += '<button class="btn expand ';
                                         if (dataObj[i].tasksigns[day_loop][tasksign_loop].grade != 'Pending') {
                                             switch (dataObj[i].tasksigns[day_loop][tasksign_loop].grade) {
