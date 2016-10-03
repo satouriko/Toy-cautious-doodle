@@ -113,18 +113,27 @@
                         append_str += '<tr>';
                         append_str += '<th>日期</th>';
                         for (j in dataObj[i].header) {
-                            append_str += '<th>' + dataObj[i].header[j].task.title + '</th>';
+                            append_str += '<th>' + dataObj[i].header[j].title + '</th>';
                         }
-                        append_str += '<th>临时任务</th>';
                         append_str += '</tr>';
                         for (day_loop in dataObj[i].tasksigns) {
                             append_str += '<tr>';
                             append_str += '<td>' + day_loop + '</td>';
                             for (j in dataObj[i].header) {
-                                var flag = false;
+                                append_str += '<td><table class="expand little-table">';
                                 for (tasksign_loop in dataObj[i].tasksigns[day_loop]) {
-                                    if (dataObj[i].tasksigns[day_loop][tasksign_loop].task_id == dataObj[i].header[j].task_id) {
-                                        append_str += '<td>';
+                                    if (dataObj[i].tasksigns[day_loop][tasksign_loop].task.family_id == dataObj[i].header[j].id) {
+                                        append_str += '<tr>';
+                                        append_str += '<td><button class="btn btn-link"';
+                                        if (dataObj[i].tasksigns[day_loop][tasksign_loop].grade != 'Pending') {
+                                            append_str += 'onclick="showTptask_nodel(\'' + encodeURI(dataObj[i].tasksigns[day_loop][tasksign_loop].task.description) + '\')">';
+
+                                        }
+                                        else {
+                                            append_str += 'onclick="showTptask(' + dataObj[i].tasksigns[day_loop][tasksign_loop].task_id + ',\'' + encodeURI(dataObj[i].tasksigns[day_loop][tasksign_loop].task.description) + '\')">';
+                                        }
+                                        append_str += dataObj[i].tasksigns[day_loop][tasksign_loop].task.title;
+                                        append_str += '</button></td><td>';
                                         append_str += '<button class="btn expand ';
                                         if (dataObj[i].tasksigns[day_loop][tasksign_loop].grade != 'Pending') {
                                             switch (dataObj[i].tasksigns[day_loop][tasksign_loop].grade) {
@@ -148,61 +157,11 @@
                                         }
                                         append_str += dataObj[i].tasksigns[day_loop][tasksign_loop].grade;
                                         append_str += '</button>';
-                                        append_str += '</td>';
-                                        flag = true;
-                                        break;
+                                        append_str += '</td></tr>';
                                     }
                                 }
-                                if (!flag) {
-                                    append_str += '<td></td>';
-                                }
+                                append_str += '</table></td>';
                             }
-                            append_str += '<td><table class="expand little-table">';
-                            for (tasksign_loop in dataObj[i].tasksigns[day_loop]) {
-                                var flag = false;
-                                for (j in dataObj[i].header) {
-                                    if (dataObj[i].tasksigns[day_loop][tasksign_loop].task_id == dataObj[i].header[j].task_id)
-                                        flag = true;
-                                }
-                                if (!flag) {
-                                    append_str += '<tr>';
-                                    append_str += '<td><button class="btn btn-link"';
-                                    if (dataObj[i].tasksigns[day_loop][tasksign_loop].grade != 'Pending') {
-                                        append_str += 'onclick="showTptask_nodel(\'' + encodeURI(dataObj[i].tasksigns[day_loop][tasksign_loop].task.description) + '\')">';
-
-                                    }
-                                    else {
-                                        append_str += 'onclick="showTptask(' + dataObj[i].tasksigns[day_loop][tasksign_loop].task_id + ',\'' + encodeURI(dataObj[i].tasksigns[day_loop][tasksign_loop].task.description) + '\')">';
-                                    }
-                                    append_str += dataObj[i].tasksigns[day_loop][tasksign_loop].task.title;
-                                    append_str += '</button></td><td>';
-                                    append_str += '<button class="btn expand ';
-                                    if (dataObj[i].tasksigns[day_loop][tasksign_loop].grade != 'Pending') {
-                                        switch (dataObj[i].tasksigns[day_loop][tasksign_loop].grade) {
-                                            case "Checked":
-                                                append_str += 'btn-success';
-                                                break;
-                                            case "Unchecked":
-                                                append_str += 'btn-danger';
-                                                break;
-                                            case "Delayed":
-                                                append_str += 'btn-warning';
-                                                break;
-                                            case "Cancelled":
-                                                append_str += 'btn-warning';
-                                                break;
-                                        }
-                                        append_str += '" onclick="showDetails(\'' + encodeURI(dataObj[i].tasksigns[day_loop][tasksign_loop].reason) + '\',\'' + encodeURI(dataObj[i].tasksigns[day_loop][tasksign_loop].comment) + '\')">';
-                                    }
-                                    else {
-                                        append_str += 'btn-info">'
-                                    }
-                                    append_str += dataObj[i].tasksigns[day_loop][tasksign_loop].grade;
-                                    append_str += '</button>';
-                                    append_str += '</td></tr>';
-                                }
-                            }
-                            append_str += '</table></td>';
                         }
                         append_str += '</table>';
                         $("#tasksign_ul").append(append_str);

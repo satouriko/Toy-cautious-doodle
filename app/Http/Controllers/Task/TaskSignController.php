@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Task;
 
+use App\Family;
 use App\Task;
 use App\Tasksign;
 use App\Tasksignheader;
@@ -39,7 +40,12 @@ class TaskSignController extends Controller
                 ->orderBy('task_id', 'asc')
                 ->with('task')
                 ->get();
-            $ret_header['header'] = $tsheader_tasks;
+            $tsheader_family_ids = array();
+            foreach ($tsheader_tasks as $tsheader_task) {
+                array_push($tsheader_family_ids,$tsheader_task->task->family_id);
+            }
+            $tsheader_families = Family::whereIn('id',$tsheader_family_ids)->get();
+            $ret_header['header'] = $tsheader_families;
             $begindate = date_create($header->begindate);
             if ($header->enddate == '0000-00-00')
                 $enddate = date_create(date('Y-m-d'));
@@ -69,6 +75,7 @@ class TaskSignController extends Controller
                         $diff_int = $diff->format("%R%a");
                         if ($diff_int >= 0 && in_array($diff_int % $rgtask_all->period + 1, $activedays)) {
                             $tasksignrg_day_fake['task_id'] = $rgtask_all->id;
+                            $tasksignrg_day_fake['task'] = $rgtask_all;
                             $tasksignrg_day_fake['grade'] = "Pending";
                             array_push($tasksigns_day, $tasksignrg_day_fake);
                         }
@@ -77,9 +84,7 @@ class TaskSignController extends Controller
                     foreach ($tptasks as $tptask) {
                         $tasksigntp_day_fake['task_id'] = $tptask->id;
                         $tasksigntp_day_fake['grade'] = "Pending";
-                        $task_fake['title'] = $tptask->title;
-                        $task_fake['description'] = $tptask->description;
-                        $tasksigntp_day_fake['task'] = $task_fake;
+                        $tasksigntp_day_fake['task'] = $tptask;
                         array_push($tasksigns_day, $tasksigntp_day_fake);
                     }
                 }
