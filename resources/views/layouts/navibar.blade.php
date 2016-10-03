@@ -92,7 +92,7 @@
                 $("#rgtaskModalTitle").html("新增任务");
                 $("#rgtask_fm input[type='text']").val("");
                 $("#rgtask_fm textarea").val("");
-                $("#rgtask_fm input[type='date']").val("");
+                $("#rgtask_fm input[type='date']").val("{{ $date_today }}");
                 $("#rgtask_fm input[type='number']").val("");
                 $("#startdate").removeAttr("disabled");
                 $("#updateRgtask_smt").text("提交");

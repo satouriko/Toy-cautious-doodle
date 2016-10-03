@@ -28,7 +28,7 @@ class EssayController extends Controller
         $essays = Essay::where('uid', $uid)->orderBy('time', 'desc')->get();
         //$data_str = $essays->toJson();
         //return $data_str;
-        return view("essay", ['user' => $user, 'essays' => $essays]);
+        return view("essay", ['user' => $user, 'essays' => $essays, 'date_today' => date('Y-m-d', time())]);
     }
 
     /**

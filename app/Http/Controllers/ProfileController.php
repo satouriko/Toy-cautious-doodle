@@ -19,6 +19,6 @@ class ProfileController extends Controller
     {
         $user = $request->user()['email'];
         $uid = $request->user()['id'];
-        return view('profile', ['user' => $user, 'uid' => $uid]);
+        return view('profile', ['user' => $user, 'uid' => $uid, 'date_today' => date('Y-m-d', time())]);
     }
 }

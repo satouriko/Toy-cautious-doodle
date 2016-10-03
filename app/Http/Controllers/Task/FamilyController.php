@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Task;
 
 use App\Family;
+use App\Task;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
@@ -71,8 +72,16 @@ class FamilyController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
-        Family::destroy($id);
+        $uid = $request->user()['id'];
+        $task_cnt = Task::where('family_id', $id)->count();
+        $family_cnt = Family::where('uid', $uid)->count();
+        if($task_cnt == 0 && $family_cnt > 1)
+            Family::destroy($id);
+        else if($task_cnt != 0)
+            return "Error: You cannot delete a family with task in it!";
+        else
+            return "Error: You cannot delete this family if it's the only family.";
     }
 }

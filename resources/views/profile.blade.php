@@ -324,7 +324,7 @@
                             $("#rgtask_ul").empty();
                             var dataObj = eval("(" + msg + ")");
                             for (i in dataObj) {
-                                $("#rgtask_ul").append("<tr><td class='expand table-control table-text'><button class='btn btn-link' onclick='showRgtaskEdit(\"" + dataObj[i].id + "\")' >" + dataObj[i].title + '</button></td><td><input class="btn btn-info" type="button" value="已经坚持' + dataObj[i].day_cnt + '天" /></td><td class="table-control" id="rgtask_del_id_' + dataObj[i].id + '">{{ csrf_field() }} {{ method_field("DELETE") }}<input class="btn btn-danger" type="button" onclick="delRgtaskLi(' + dataObj[i].id + ')" value="删除" /></td></tr>');
+                                $("#rgtask_ul").append("<tr><td class='expand table-control table-text'><button class='btn btn-link' onclick='showRgtaskEdit(\"" + dataObj[i].id + "\")' >" + dataObj[i].title + '</button></td><td><input class="btn btn-info" type="button" value="已经坚持' + dataObj[i].day_cnt + '天" /></td><td class="table-control" id="rgtask_del_id_' + dataObj[i].id + '">{{ csrf_field() }} {{ method_field("DELETE") }}<input class="btn btn-danger" type="button" onclick="delRgtaskLi(' + dataObj[i].id + ')" value="删除"/></td></tr>');
                             }
                         }
                     });
@@ -397,13 +397,13 @@
                         $("#rgtaskModalTitle").html("新增任务");
                         $("#rgtask_fm input[type='text']").val("");
                         $("#rgtask_fm textarea").val("");
-                        $("#rgtask_fm input[type='date']").val("");
+                        $("#rgtask_fm input[type='date']").val("{{ $date_today }}");
                         $("#rgtask_fm input[type='number']").val("");
                         $("#startdate").removeAttr("disabled");
                         $("#updateRgtask_smt").text("提交");
                         $("#rgtaskEditModal").modal('show');
                     });
-                })
+                });
             </script>
             <div class="panel panel-default">
                 <div class="panel-heading">
@@ -412,6 +412,7 @@
                     </h3>
                 </div>
                 <div class="panel-body">
+                    <div id="alertarea"></div>
                     <table class="form-horizontal center">
                         <tbody id="family_ul"></tbody>
                         <tfoot>
@@ -469,6 +470,14 @@
                         url: "/task/family/" + id.toString(),
                         data: str_data,
                         success: function (msg) {
+                            if(msg == "Error: You cannot delete a family with task in it!") {
+                                var str = '<div class="alert alert-warning fade in"><a href="#" class="close" data-dismiss="alert">&times;</a><strong>警告！</strong>有任务的分类不可被删除。</div>';
+                                $('#alertarea').append(str);
+                            }
+                            if(msg == "Error: You cannot delete this family if it's the only family.") {
+                                var str = '<div class="alert alert-warning fade in"><a href="#" class="close" data-dismiss="alert">&times;</a><strong>警告！</strong>你不能删除唯一存在的分类。</div>';
+                                $('#alertarea').append(str);
+                            }
                             loadFamilyUl();
                         }
                     })

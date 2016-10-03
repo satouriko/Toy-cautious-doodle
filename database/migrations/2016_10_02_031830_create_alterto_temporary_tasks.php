@@ -2,8 +2,9 @@
 
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use App\User;
+use App\Family;
 use App\Task;
-use App\Tasksignheader;
 
 class CreateAltertoTemporaryTasks extends Migration
 {
@@ -28,6 +29,20 @@ class CreateAltertoTemporaryTasks extends Migration
             $table->string('type');
             $table->integer('priority');
         });
+        $users = User::all();
+        foreach ($users as $user) {
+            $family = new Family();
+            $family->uid = $user->id;
+            $family->title = "未分类";
+            $family->description = "这是TCD升级后自动生成的分类";
+            $family->save();
+            $tasks = Task::where('uid', $user->id)->get();
+            foreach ($tasks as $task) {
+                $task->family_id = $family->id;
+                $task->type = "state";
+                $task->save();
+            }
+        }
         Schema::create('ongoingtasks', function (Blueprint $table) {
             $table->increments('id');
             $table->date('taskdate');
