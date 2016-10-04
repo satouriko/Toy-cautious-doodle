@@ -251,6 +251,20 @@ class TaskSignController extends Controller
         foreach ($ids as $looper => $ogtask_id) {
             $ogtask = Ongoingtask::where('id', $ogtask_id)->with('task')->first();
 
+            if($grades[$looper] == "Checked" && $ogtask->taskdate != date('Y-m-d')) {
+                $tasksigns_old = Tasksign::where('task_id', $ogtask->task_id)
+                    ->where('taskdate', $ogtask->taskdate)
+                    ->get();
+                foreach ($tasksigns_old as $tasksign_old) {
+                    if($tasksign_old->grade == "Delayed")
+                        $tasksign_old->grade = "D-Checked";
+                    else
+                        $tasksign_old->grade = "U-Checked";
+                    $tasksign_old->checkdate = date('Y-m-d');
+                    $tasksign_old->save();
+                }
+            }
+
             $tasksign = new Tasksign();
             $tasksign->date = date('Y-m-d');
             $tasksign->taskdate = $ogtask->taskdate;
@@ -269,6 +283,7 @@ class TaskSignController extends Controller
             }
             else
                 Ongoingtask::destroy($ogtask_id);
+
         }
 
         return redirect('/');

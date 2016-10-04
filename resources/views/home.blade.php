@@ -178,13 +178,24 @@
                                                 case "Cancelled":
                                                     append_str += 'btn-warning';
                                                     break;
+                                                case "U-Checked":
+                                                    append_str += 'btn-danger';
+                                                    break;
+                                                case "D-Checked":
+                                                    append_str += 'btn-warning';
+                                                    break;
                                             }
                                             append_str += '" onclick="showDetails(\'' + encodeURI(dataObj[i].tasksigns[day_loop][tasksign_loop].reason) + '\',\'' + encodeURI(dataObj[i].tasksigns[day_loop][tasksign_loop].comment) + '\')">';
                                         }
                                         else {
                                             append_str += 'btn-info">'
                                         }
-                                        append_str += dataObj[i].tasksigns[day_loop][tasksign_loop].grade;
+                                        if(dataObj[i].tasksigns[day_loop][tasksign_loop].grade != 'U-Checked'
+                                                && dataObj[i].tasksigns[day_loop][tasksign_loop].grade != 'D-Checked'
+                                        )
+                                            append_str += dataObj[i].tasksigns[day_loop][tasksign_loop].grade;
+                                        else
+                                            append_str += dataObj[i].tasksigns[day_loop][tasksign_loop].checkdate;
                                         append_str += '</button>';
                                         append_str += '</td></tr>';
                                     }
