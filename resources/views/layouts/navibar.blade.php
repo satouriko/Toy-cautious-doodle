@@ -34,7 +34,18 @@
                 <a class="navbar-brand" href="/">Toy Cautious Doodle</a>
             </div>
             <div>
-                <ul class="nav navbar-nav navbar-left">
+                <ul class="nav navbar-nav navbar-left">.
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            视图
+                            <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="/">任务视图</a></li>
+                            <li><a href="/desti">目标视图</a></li>
+                            <li><a href="/daily">每日视图</a></li>
+                        </ul>
+                    </li>
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                             任务

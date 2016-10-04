@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Task;
 
+use DB;
 use App\Family;
 use App\Ongoingtask;
 use App\Task;
@@ -128,6 +129,67 @@ class TaskSignController extends Controller
         return json_encode($ret);
     }
 
+    public function index_desti(Request $request)
+    {
+        $uid = $request->user()['id'];
+        $ret = array();
+
+        $first_header = Tasksignheader::where('uid', $uid)
+            ->orderBy('begindate', 'desc')
+            ->first();
+        $tsheader_tasks = Tasksignheadertask::select(DB::raw('tasksignheadertasks.*'))
+            ->leftJoin(DB::raw('(select id, family_id from tasks) as task'), 'task.id', '=', 'tasksignheadertasks.task_id')
+            ->where('tasksignheader_id', $first_header->id)
+            ->orderBy('family_id', 'asc')
+            ->get();
+        $tsheader_family_ids = array();
+        foreach ($tsheader_tasks as $tsheader_task) {
+            array_push($tsheader_family_ids,$tsheader_task->task->family_id);
+        }
+        $tsheader_families = Family::whereIn('id',$tsheader_family_ids)->orderBy('id', 'asc')->get();
+        foreach ($tsheader_families as $tsheader_family) {
+            $cnt = 0;
+            foreach ($tsheader_family_ids as $tsheader_family_id) {
+                if($tsheader_family->id == $tsheader_family_id)
+                    $cnt++;
+            }
+            $tsheader_family['count'] = $cnt;
+        }
+        $ret['header'] = $tsheader_families;
+        $ret['headertasks'] = $tsheader_tasks;
+        $headers = Tasksignheader::where('uid', $uid)
+            ->orderBy('begindate', 'desc')
+            ->get();
+        foreach ($headers as $header) {
+            if ($header->begindate == $header->enddate)
+                continue;
+
+            $begindate = date_create($header->begindate);
+            if ($header->enddate == '0000-00-00')
+                $enddate = date_create(date('Y-m-d'));
+            else {
+                $enddate = date_create($header->enddate);
+                date_modify($enddate, "-1 day");
+            }
+            while (date_diff($begindate, $enddate)->format("%R%a") >= 0) {
+                $tasksigns_day_cnt = Tasksign::where('tasksignheader_id', $header->id)
+                    ->where('date', $enddate)
+                    ->count();
+                if ($tasksigns_day_cnt > 0) {
+                    $tasksigns_day = Tasksign::where('tasksignheader_id', $header->id)
+                        ->where('date', $enddate)
+                        ->orderBy('task_id', 'asc')
+                        ->with('task')
+                        ->get();
+                    $ret['tasksigns'][$enddate->format('Y-m-d')] = $tasksigns_day;
+                }
+                date_modify($enddate, "-1 day");
+            }
+        }
+
+        return json_encode($ret);
+    }
+
     public function check(Request $request)
     {
         $uid = $request->user()['id'];
@@ -221,10 +283,8 @@ class TaskSignController extends Controller
                 $query->where('uid', $uid);
             })->get();
         foreach ($tasksigns_today as $tasksign_today) {
-            $ogtask = new Ongoingtask();
-            $ogtask->taskdate = $tasksign_today->taskdate;
+            $ogtask = Ongoingtask::firstOrNew(['taskdate' => $tasksign_today->taskdate, 'task_id' => $tasksign_today->task_id]);
             $ogtask->detail = $tasksign_today->detail;
-            $ogtask->task_id = $tasksign_today->task_id;
             $ogtask->save();
         }
         Tasksign::where('date', date('Y-m-d'))

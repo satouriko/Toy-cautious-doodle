@@ -72,22 +72,24 @@
             $('#comment_p').text(comment);
             $('#showDetailModal').modal('show');
         }
-        function showTptask(id, description, detail) {
+        function showTptask(id, description, detail, taskdate) {
             description = decodeURI(description);
             $('#delTptaskId').val(id);
             $('#description_p').text(description);
             $('#tp_detail').val(detail);
             $('#tp_detail').removeAttr('disabled');
+            $('#og_taskdate').val(taskdate);
             $('#delTptask_smt').attr('style', 'display: inline-block');
             $('#updateOgtask_smt').attr('style', 'display: inline-block');
             $('#showTptaskModal').modal('show');
         }
-        function showTptask_nodel(description, detail) {
+        function showTptask_nodel(description, detail, taskdate) {
             description = decodeURI(description);
             $('#delTptaskId').val();
             $('#description_p').text(description);
             $('#tp_detail').val(detail);
             $('#tp_detail').attr('disabled', 'disabled');
+            $('#og_taskdate').val(taskdate);
             $('#delTptask_smt').attr('style', 'display: none');
             $('#updateOgtask_smt').attr('style', 'display: none');
             $('#showTptaskModal').modal('show');
@@ -151,11 +153,11 @@
                                         append_str += '<tr>';
                                         append_str += '<td><button class="btn btn-link"';
                                         if (dataObj[i].tasksigns[day_loop][tasksign_loop].grade != 'Pending') {
-                                            append_str += 'onclick="showTptask_nodel(\'' + encodeURI(dataObj[i].tasksigns[day_loop][tasksign_loop].task.description) + '\',\'' + encodeURI(dataObj[i].tasksigns[day_loop][tasksign_loop].detail) + '\')">';
+                                            append_str += 'onclick="showTptask_nodel(\'' + encodeURI(dataObj[i].tasksigns[day_loop][tasksign_loop].task.description) + '\',\'' + encodeURI(dataObj[i].tasksigns[day_loop][tasksign_loop].detail) + '\',\'' + encodeURI(dataObj[i].tasksigns[day_loop][tasksign_loop].taskdate) + '\')">';
 
                                         }
                                         else {
-                                            append_str += 'onclick="showTptask(' + dataObj[i].tasksigns[day_loop][tasksign_loop].id + ',\'' + encodeURI(dataObj[i].tasksigns[day_loop][tasksign_loop].task.description) + '\',\'' + encodeURI(dataObj[i].tasksigns[day_loop][tasksign_loop].detail) + '\')">';
+                                            append_str += 'onclick="showTptask(' + dataObj[i].tasksigns[day_loop][tasksign_loop].id + ',\'' + encodeURI(dataObj[i].tasksigns[day_loop][tasksign_loop].task.description) + '\',\'' + encodeURI(dataObj[i].tasksigns[day_loop][tasksign_loop].detail) + '\',\'' + encodeURI(dataObj[i].tasksigns[day_loop][tasksign_loop].taskdate) + '\')">';
                                         }
                                         append_str += dataObj[i].tasksigns[day_loop][tasksign_loop].task.title;
                                         append_str += '</button></td><td>';
@@ -249,6 +251,12 @@
                             <label class="col-sm-2 col-sm-offset-1 control-label">任务描述</label>
                             <div class="col-sm-8">
                                 <p id="description_p"></p>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="og_taskdate" class="col-sm-2 col-sm-offset-1 control-label">任务日</label>
+                            <div class="col-sm-6">
+                                <input type="date" class="form-control" id="og_taskdate" name="taskdate" disabled>
                             </div>
                         </div>
                         <div class="form-group">

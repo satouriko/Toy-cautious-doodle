@@ -13,6 +13,8 @@
 
 Route::get('/', 'HomeController@index');
 
+Route::get('/desti', 'DestinationController@index');
+
 Route::get('about', 'AboutController@index');
 
 Route::get('profile', 'ProfileController@index');
@@ -37,6 +39,8 @@ Route::resource('task/ogtask', 'Task\OngoingTaskController',
 
 Route::resource('task/tasksign', 'Task\TaskSignController',
     ['only' => ['index', 'create', 'store']]);
+
+Route::get('task/tasksign/desti', 'Task\TaskSignController@index_desti');
 
 Route::get('task/tasksign/check', 'Task\TaskSignController@check');
 
