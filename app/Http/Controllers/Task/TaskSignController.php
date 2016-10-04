@@ -187,7 +187,7 @@ class TaskSignController extends Controller
             ->first();
 
         foreach ($ids as $looper => $ogtask_id) {
-            $ogtask = Ongoingtask::where('id', $ogtask_id)->first();
+            $ogtask = Ongoingtask::where('id', $ogtask_id)->with('task')->first();
 
             $tasksign = new Tasksign();
             $tasksign->date = date('Y-m-d');
@@ -201,7 +201,11 @@ class TaskSignController extends Controller
 
             $tasksign->save();
 
-            if($tasksign->grade == "Checked" || $tasksign->grade == "Cancelled")
+            if($ogtask->task->type == "activity") {
+                if ($tasksign->grade == "Checked" || $tasksign->grade == "Cancelled")
+                    Ongoingtask::destroy($ogtask_id);
+            }
+            else
                 Ongoingtask::destroy($ogtask_id);
         }
 
