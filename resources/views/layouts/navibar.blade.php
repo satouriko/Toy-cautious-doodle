@@ -43,7 +43,7 @@
                         <ul class="dropdown-menu">
                             <li><a href="/">任务视图</a></li>
                             <li><a href="/desti">目标视图</a></li>
-                            <li><a href="/daily">每日视图</a></li>
+                            {{--<li><a href="/daily">每日视图</a></li>--}}
                         </ul>
                     </li>
                     <li class="dropdown">

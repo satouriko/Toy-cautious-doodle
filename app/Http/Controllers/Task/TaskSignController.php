@@ -92,6 +92,7 @@ class TaskSignController extends Controller
                 if ($tasksigns_day_cnt > 0) {
                     $tasksigns_day = Tasksign::where('tasksignheader_id', $header->id)
                         ->where('date', $enddate)
+                        ->orderBy('taskdate', 'asc')
                         ->orderBy('task_id', 'asc')
                         ->with('task')
                         ->get();
@@ -100,7 +101,11 @@ class TaskSignController extends Controller
                 else if($enddate == date_create(date('Y-m-d'))) {
                     $ogtasks = Ongoingtask::whereHas('task', function ($query) use ($uid) {
                         $query->where('uid', $uid);
-                    })->with('task')->get();
+                    })
+                        ->with('task')
+                        ->orderBy('taskdate', 'asc')
+                        ->orderBy('task_id', 'asc')
+                        ->get();
                     foreach ($ogtasks as $ogtask) {
                         $ogtask->grade = "Pending";
                     }
