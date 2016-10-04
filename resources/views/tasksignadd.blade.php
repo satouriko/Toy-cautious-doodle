@@ -68,8 +68,12 @@
                     <input type="hidden" name="task_id[{{ $task->id }}]" value="{{ $task->id }}">
                     <div class="task-group">
                         <div class="form-group">
-                            <label class="label-title">{{ $task->title }}</label>
-                            <p class="description center">{{ $task->description }}</p>
+                            <label class="label-title">{{ $task->task->title }}</label>
+                            <p class="description center">{{ $task->task->description }}</p>
+                        </div>
+                        <div class="form-group">
+                            <label>具体描述</label>
+                            <p class="description center">{{ $task->detail }}</p>
                         </div>
                         <div class="form-group">
                             <label>完成情况</label>

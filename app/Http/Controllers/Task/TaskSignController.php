@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers\Task;
 
+use DB;
+use App\Family;
+use App\Ongoingtask;
 use App\Task;
 use App\Tasksign;
 use App\Tasksignheader;
@@ -27,10 +30,38 @@ class TaskSignController extends Controller
     public function index(Request $request)
     {
         $uid = $request->user()['id'];
+
+        //维护Ongoing Tasks
+        //按任务（！不是按表头）计算出今日任务
+        $rgtasks_all = Task::where('uid', $uid)->where('temporary', false)->where('valid', true)->get();
+        $rgtasks = array();
+        foreach ($rgtasks_all as $rgtask_all) {
+            $activedays = explode(',', $rgtask_all->activeday);
+            $date_now = date_create(date('Y-m-d'));
+            $date_start = date_create($rgtask_all->startdate);
+            $diff = date_diff($date_start, $date_now);
+            $diff_int = $diff->format("%R%a");
+            if ($diff_int >= 0 && in_array($diff_int % $rgtask_all->period + 1, $activedays)) {
+                array_push($rgtasks, $rgtask_all);
+            }
+
+        }
+        $tptasks = Task::where('uid', $uid)->where('temporary', true)->where('startdate', date('Y-m-d'))->get();
+        foreach ($rgtasks as $task) {
+            if(Tasksign::where('taskdate', date('Y-m-d'))->where('task_id', $task->id)->count() == 0)
+                Ongoingtask::firstOrCreate(['taskdate' => date('Y-m-d'), 'task_id' => $task->id]);
+        }
+        foreach ($tptasks as $task) {
+            if(Tasksign::where('taskdate', date('Y-m-d'))->where('task_id', $task->id)->count() == 0)
+                Ongoingtask::firstOrCreate(['taskdate' => date('Y-m-d'), 'task_id' => $task->id]);
+        }
+
+        //开始生成Tasksign Index
         $headers = Tasksignheader::where('uid', $uid)
             ->orderBy('begindate', 'desc')
             ->get();
         $ret = array();
+        $ret_header_temp = array('header' => array(), 'tasksign' => array()); //一级缓存
         foreach ($headers as $header) {
             if ($header->begindate == $header->enddate)
                 continue;
@@ -39,7 +70,12 @@ class TaskSignController extends Controller
                 ->orderBy('task_id', 'asc')
                 ->with('task')
                 ->get();
-            $ret_header['header'] = $tsheader_tasks;
+            $tsheader_family_ids = array();
+            foreach ($tsheader_tasks as $tsheader_task) {
+                array_push($tsheader_family_ids,$tsheader_task->task->family_id);
+            }
+            $tsheader_families = Family::whereIn('id',$tsheader_family_ids)->get();
+            $ret_header['header'] = $tsheader_families;
             $begindate = date_create($header->begindate);
             if ($header->enddate == '0000-00-00')
                 $enddate = date_create(date('Y-m-d'));
@@ -53,41 +89,107 @@ class TaskSignController extends Controller
                 $tasksigns_day_cnt = Tasksign::where('tasksignheader_id', $header->id)
                     ->where('date', $enddate)
                     ->count();
-                if ($tasksigns_day_cnt > 0)
+                if ($tasksigns_day_cnt > 0) {
+                    $tasksigns_day = Tasksign::where('tasksignheader_id', $header->id)
+                        ->where('date', $enddate)
+                        ->orderBy('taskdate', 'asc')
+                        ->orderBy('task_id', 'asc')
+                        ->with('task')
+                        ->get();
+                    $tasksigns[$enddate->format('Y-m-d')] = $tasksigns_day;
+                }
+                else if($enddate == date_create(date('Y-m-d'))) {
+                    $ogtasks = Ongoingtask::whereHas('task', function ($query) use ($uid) {
+                        $query->where('uid', $uid);
+                    })
+                        ->with('task')
+                        ->orderBy('taskdate', 'asc')
+                        ->orderBy('task_id', 'asc')
+                        ->get();
+                    foreach ($ogtasks as $ogtask) {
+                        $ogtask->grade = "Pending";
+                    }
+                    $tasksigns[date('Y-m-d', time())] = $ogtasks;
+                }
+                date_modify($enddate, "-1 day");
+            }
+
+            $ret_header['tasksigns'] = $tasksigns;
+
+            //智能合并表头
+            if($ret_header['header'] != $ret_header_temp['header']) {
+                if($ret_header_temp['header'] != null)
+                    array_push($ret, $ret_header_temp);
+                $ret_header_temp = $ret_header;
+            }
+            else {
+                foreach ($ret_header['tasksigns'] as $key => $tasksign) {
+                    $ret_header_temp['tasksigns'][$key] = $tasksign;
+                }
+            }
+        }
+        if($ret_header_temp['header'] != null)
+            array_push($ret, $ret_header_temp);
+
+        return json_encode($ret);
+    }
+
+    public function index_desti(Request $request)
+    {
+        $uid = $request->user()['id'];
+        $ret = array();
+
+        $first_header = Tasksignheader::where('uid', $uid)
+            ->orderBy('begindate', 'desc')
+            ->first();
+        $tsheader_tasks = Tasksignheadertask::select(DB::raw('tasksignheadertasks.*'))
+            ->leftJoin(DB::raw('(select id, family_id from tasks) as task'), 'task.id', '=', 'tasksignheadertasks.task_id')
+            ->where('tasksignheader_id', $first_header->id)
+            ->orderBy('family_id', 'asc')
+            ->get();
+        $tsheader_family_ids = array();
+        foreach ($tsheader_tasks as $tsheader_task) {
+            array_push($tsheader_family_ids,$tsheader_task->task->family_id);
+        }
+        $tsheader_families = Family::whereIn('id',$tsheader_family_ids)->orderBy('id', 'asc')->get();
+        foreach ($tsheader_families as $tsheader_family) {
+            $cnt = 0;
+            foreach ($tsheader_family_ids as $tsheader_family_id) {
+                if($tsheader_family->id == $tsheader_family_id)
+                    $cnt++;
+            }
+            $tsheader_family['count'] = $cnt;
+        }
+        $ret['header'] = $tsheader_families;
+        $ret['headertasks'] = $tsheader_tasks;
+        $headers = Tasksignheader::where('uid', $uid)
+            ->orderBy('begindate', 'desc')
+            ->get();
+        foreach ($headers as $header) {
+            if ($header->begindate == $header->enddate)
+                continue;
+
+            $begindate = date_create($header->begindate);
+            if ($header->enddate == '0000-00-00')
+                $enddate = date_create(date('Y-m-d'));
+            else {
+                $enddate = date_create($header->enddate);
+                date_modify($enddate, "-1 day");
+            }
+            while (date_diff($begindate, $enddate)->format("%R%a") >= 0) {
+                $tasksigns_day_cnt = Tasksign::where('tasksignheader_id', $header->id)
+                    ->where('date', $enddate)
+                    ->count();
+                if ($tasksigns_day_cnt > 0) {
                     $tasksigns_day = Tasksign::where('tasksignheader_id', $header->id)
                         ->where('date', $enddate)
                         ->orderBy('task_id', 'asc')
                         ->with('task')
                         ->get();
-                else {
-                    $tasksigns_day = array();
-                    $rgtasks_all = Task::where('uid', $uid)->where('temporary', false)->where('valid', true)->get();
-                    foreach ($rgtasks_all as $rgtask_all) {
-                        $activedays = explode(',', $rgtask_all->activeday);
-                        $date_start = date_create($rgtask_all->startdate);
-                        $diff = date_diff($date_start, $enddate);
-                        $diff_int = $diff->format("%R%a");
-                        if ($diff_int >= 0 && in_array($diff_int % $rgtask_all->period + 1, $activedays)) {
-                            $tasksignrg_day_fake['task_id'] = $rgtask_all->id;
-                            $tasksignrg_day_fake['grade'] = "Pending";
-                            array_push($tasksigns_day, $tasksignrg_day_fake);
-                        }
-                    }
-                    $tptasks = Task::where('uid', $uid)->where('temporary', true)->where('startdate', $enddate)->get();
-                    foreach ($tptasks as $tptask) {
-                        $tasksigntp_day_fake['task_id'] = $tptask->id;
-                        $tasksigntp_day_fake['grade'] = "Pending";
-                        $task_fake['title'] = $tptask->title;
-                        $task_fake['description'] = $tptask->description;
-                        $tasksigntp_day_fake['task'] = $task_fake;
-                        array_push($tasksigns_day, $tasksigntp_day_fake);
-                    }
+                    $ret['tasksigns'][$enddate->format('Y-m-d')] = $tasksigns_day;
                 }
-                $tasksigns[$enddate->format('Y-m-d')] = $tasksigns_day;
                 date_modify($enddate, "-1 day");
             }
-            $ret_header['tasksigns'] = $tasksigns;
-            array_push($ret, $ret_header);
         }
 
         return json_encode($ret);
@@ -124,27 +226,11 @@ class TaskSignController extends Controller
             return redirect('/');
         else {
             $user = $request->user()['email'];
-            //按任务（！不是按表头）计算出今日任务
-            $rgtasks_all = Task::where('uid', $uid)->where('temporary', false)->where('valid', true)->get();
-            $rgtasks = array();
-            foreach ($rgtasks_all as $rgtask_all) {
-                $activedays = explode(',', $rgtask_all->activeday);
-                $date_now = date_create(date('Y-m-d'));
-                $date_start = date_create($rgtask_all->startdate);
-                $diff = date_diff($date_start, $date_now);
-                $diff_int = $diff->format("%R%a");
-                if ($diff_int >= 0 && in_array($diff_int % $rgtask_all->period + 1, $activedays)) {
-                    array_push($rgtasks, $rgtask_all);
-                }
-
-            }
-            $tptasks = Task::where('uid', $uid)->where('temporary', true)->where('startdate', date('Y-m-d'))->get();
-            $tasks = $rgtasks;
-            foreach ($tptasks as $tptask) {
-                array_push($tasks, $tptask);
-            }
+            $tasks = Ongoingtask::whereHas('task', function ($query) use ($uid) {
+                $query->where('uid', $uid);
+            })->with('task')->get();
             //return json_encode($tasks);
-            return view("tasksignadd", ['user' => $user, 'tasks' => $tasks]);
+            return view("tasksignadd", ['user' => $user, 'tasks' => $tasks, 'date_today' => date('Y-m-d', time())]);
         }
     }
 
@@ -167,17 +253,42 @@ class TaskSignController extends Controller
             ->orderBy('begindate', 'desc')
             ->first();
 
-        foreach ($ids as $looper => $task_id) {
+        foreach ($ids as $looper => $ogtask_id) {
+            $ogtask = Ongoingtask::where('id', $ogtask_id)->with('task')->first();
+
+            if($grades[$looper] == "Checked" && $ogtask->taskdate != date('Y-m-d')) {
+                $tasksigns_old = Tasksign::where('task_id', $ogtask->task_id)
+                    ->where('taskdate', $ogtask->taskdate)
+                    ->get();
+                foreach ($tasksigns_old as $tasksign_old) {
+                    if($tasksign_old->grade == "Delayed")
+                        $tasksign_old->grade = "D-Checked";
+                    else
+                        $tasksign_old->grade = "U-Checked";
+                    $tasksign_old->checkdate = date('Y-m-d');
+                    $tasksign_old->save();
+                }
+            }
 
             $tasksign = new Tasksign();
             $tasksign->date = date('Y-m-d');
-            $tasksign->task_id = $task_id;
+            $tasksign->taskdate = $ogtask->taskdate;
+            $tasksign->detail = $ogtask->detail;
+            $tasksign->task_id = $ogtask->task_id;
             $tasksign->grade = $grades[$looper];
             $tasksign->reason = $reasons[$looper];
             $tasksign->comment = $comments[$looper];
             $tasksign->tasksignheader_id = $tasksignheader['id'];
 
             $tasksign->save();
+
+            if($ogtask->task->type == "activity") {
+                if ($tasksign->grade == "Checked" || $tasksign->grade == "Cancelled")
+                    Ongoingtask::destroy($ogtask_id);
+            }
+            else
+                Ongoingtask::destroy($ogtask_id);
+
         }
 
         return redirect('/');
@@ -187,6 +298,15 @@ class TaskSignController extends Controller
     public function reset(Request $request)
     {
         $uid = $request->user()['id'];
+        $tasksigns_today = Tasksign::where('date', date('Y-m-d'))
+            ->whereHas('task', function ($query) use ($uid) {
+                $query->where('uid', $uid);
+            })->get();
+        foreach ($tasksigns_today as $tasksign_today) {
+            $ogtask = Ongoingtask::firstOrNew(['taskdate' => $tasksign_today->taskdate, 'task_id' => $tasksign_today->task_id]);
+            $ogtask->detail = $tasksign_today->detail;
+            $ogtask->save();
+        }
         Tasksign::where('date', date('Y-m-d'))
             ->whereHas('task', function ($query) use ($uid) {
                 $query->where('uid', $uid);

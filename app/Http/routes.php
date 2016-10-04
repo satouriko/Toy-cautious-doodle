@@ -13,6 +13,8 @@
 
 Route::get('/', 'HomeController@index');
 
+Route::get('/desti', 'DestinationController@index');
+
 Route::get('about', 'AboutController@index');
 
 Route::get('profile', 'ProfileController@index');
@@ -26,14 +28,19 @@ Route::resource('profile/signature', 'Profile\SignatureController',
 Route::resource('profile/goal', 'Profile\GoalController',
     ['only' => ['index', 'store', 'update']]);
 
+Route::resource('task/family', 'Task\FamilyController',
+    ['only' => ['index', 'store', 'update', 'destroy']]);
+
 Route::resource('task/rgtask', 'Task\RegularTaskController',
     ['only' => ['index', 'store', 'update', 'destroy']]);
 
-Route::resource('task/tptask', 'Task\TemporaryTaskController',
-    ['only' => ['index', 'store', 'destroy']]);
+Route::resource('task/ogtask', 'Task\OngoingTaskController',
+    ['only' => ['update', 'destroy']]);
 
 Route::resource('task/tasksign', 'Task\TaskSignController',
     ['only' => ['index', 'create', 'store']]);
+
+Route::get('task/tasksign/desti', 'Task\TaskSignController@index_desti');
 
 Route::get('task/tasksign/check', 'Task\TaskSignController@check');
 

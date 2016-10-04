@@ -34,7 +34,18 @@
                 <a class="navbar-brand" href="/">Toy Cautious Doodle</a>
             </div>
             <div>
-                <ul class="nav navbar-nav navbar-left">
+                <ul class="nav navbar-nav navbar-left">.
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            视图
+                            <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="/">任务视图</a></li>
+                            <li><a href="/desti">目标视图</a></li>
+                            {{--<li><a href="/daily">每日视图</a></li>--}}
+                        </ul>
+                    </li>
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                             任务
@@ -78,20 +89,42 @@
     <script>
         $(document).ready(function () {
             $("#ddm_adrgtask").click(function () {
+                $.ajax({
+                    type: "GET",
+                    url: "/task/family",
+                    success: function (msg) {
+                        $("#taskfamily").empty();
+                        var dataObj = eval("(" + msg + ")");
+                        for (i in dataObj) {
+                            $("#taskfamily").append("<option value=" + dataObj[i].id + ">" + dataObj[i].title + '</option>');
+                        }
+                    }
+                });
                 $("#rgtaskModalTitle").html("新增任务");
                 $("#rgtask_fm input[type='text']").val("");
                 $("#rgtask_fm textarea").val("");
-                $("#rgtask_fm input[type='date']").val("");
+                $("#rgtask_fm input[type='date']").val("{{ $date_today }}");
                 $("#rgtask_fm input[type='number']").val("");
                 $("#startdate").removeAttr("disabled");
                 $("#updateRgtask_smt").text("提交");
                 $("#rgtaskEditModal").modal('show');
             });
             $("#ddm_adtptask").click(function () {
+                $.ajax({
+                    type: "GET",
+                    url: "/task/family",
+                    success: function (msg) {
+                        $("#tp_taskfamily").empty();
+                        var dataObj = eval("(" + msg + ")");
+                        for (i in dataObj) {
+                            $("#tp_taskfamily").append("<option value=" + dataObj[i].id + ">" + dataObj[i].title + '</option>');
+                        }
+                    }
+                });
                 $("#tptaskModalTitle").html("新增任务");
                 $("#tptask_fm input[type='text']").val("");
                 $("#tptask_fm textarea").val("");
-                $("#tptask_fm input[type='date']").val("");
+                $("#tptask_fm input[type='date']").val("{{ $date_today }}");
                 $("#updateTptask_smt").text("提交");
                 $("#tptaskEditModal").modal('show');
             });
@@ -121,7 +154,10 @@
                     var str_data2 = $("#rgtask_fm textarea").map(function () {
                         return ($(this).attr("name") + '=' + $(this).val());
                     }).get().join("&");
-                    var str_data = str_data1 + '&' + str_data2;
+                    var str_data3 = $("#rgtask_fm select").map(function () {
+                        return ($(this).attr("name") + '=' + $(this).val());
+                    }).get().join("&");
+                    var str_data = str_data1 + '&' + str_data2 + '&' + str_data3;
                     $.ajax({
                         type: "POST",
                         url: "/task/rgtask",
@@ -140,8 +176,11 @@
                     var str_data2 = $("#rgtask_fm textarea").map(function () {
                         return ($(this).attr("name") + '=' + $(this).val());
                     }).get().join("&");
+                    var str_data4 = $("#rgtask_fm select").map(function () {
+                        return ($(this).attr("name") + '=' + $(this).val());
+                    }).get().join("&");
                     var str_data3 = "_method=PUT";
-                    var str_data = str_data1 + '&' + str_data2 + '&' + str_data3;
+                    var str_data = str_data1 + '&' + str_data2 + '&' + str_data3 + '&' + str_data4;
                     var id = $("#rgtaskEditId").val();
                     $.ajax({
                         type: "POST",
@@ -161,10 +200,13 @@
                 var str_data2 = $("#tptask_fm textarea").map(function () {
                     return ($(this).attr("name") + '=' + $(this).val());
                 }).get().join("&");
-                var str_data = str_data1 + '&' + str_data2;
+                var str_data3 = $("#tptask_fm select").map(function () {
+                    return ($(this).attr("name") + '=' + $(this).val());
+                }).get().join("&");
+                var str_data = str_data1 + '&' + str_data2 + '&' + str_data3;
                 $.ajax({
                     type: "POST",
-                    url: "/task/tptask",
+                    url: "/task/rgtask",
                     data: str_data,
                     success: function (msg) {
                         $("#tptaskEditModal").modal('hide');
@@ -223,6 +265,7 @@
                     <div id="rgtask_fm" class="form-horizontal">
                         {{ csrf_field() }}
                         <input type="hidden" id="rgtaskEditId"/>
+                        <input type="hidden" name="temporary" value=0 />
                         <div class="form-group">
                             <label for="tasktitle" class="col-sm-2 col-sm-offset-1 control-label">任务名称</label>
                             <div class="col-sm-6">
@@ -233,6 +276,22 @@
                             <label for="taskdesc" class="col-sm-2 col-sm-offset-1 col-xs-12 control-label">任务描述</label>
                             <div class="col-sm-7">
                                 <textarea class="form-control" id="taskdesc" name="description"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="taskfamily" class="col-sm-2 col-sm-offset-1 col-xs-12 control-label">任务分类</label>
+                            <div class="col-sm-7">
+                                <select class="form-control" id="taskfamily" name="family_id">
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="tasktype" class="col-sm-2 col-sm-offset-1 col-xs-12 control-label">任务类型</label>
+                            <div class="col-sm-7">
+                                <select class="form-control" id="tasktype" name="type">
+                                    <option value="state">状态类</option>
+                                    <option value="activity">任务类</option>
+                                </select>
                             </div>
                         </div>
                         <div class="form-group">
@@ -293,10 +352,18 @@
                 <div class="modal-body">
                     <div id="tptask_fm" class="form-horizontal">
                         {{ csrf_field() }}
+                        <input type="hidden" name="temporary" value=1 />
                         <div class="form-group">
                             <label for="tp_tasktitle" class="col-sm-2 col-sm-offset-1 control-label">任务名称</label>
                             <div class="col-sm-6">
                                 <input type="text" class="form-control" id="tp_tasktitle" name="title">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="taskfamily" class="col-sm-2 col-sm-offset-1 col-xs-12 control-label">任务分类</label>
+                            <div class="col-sm-7">
+                                <select class="form-control" id="tp_taskfamily" name="family_id">
+                                </select>
                             </div>
                         </div>
                         <div class="form-group">

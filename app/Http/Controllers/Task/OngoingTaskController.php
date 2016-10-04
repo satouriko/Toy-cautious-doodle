@@ -1,16 +1,18 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Task;
 
-use App\Essay;
-use App\Tasksign;
+use App\Ongoingtask;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
+use App\Task;
+use App\Tasksignheadertask;
 
-class EssayController extends Controller
+class OngoingTaskController extends Controller
 {
+
     public function __construct()
     {
         $this->middleware('auth');
@@ -21,14 +23,9 @@ class EssayController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index()
     {
-        $uid = $request->user()['id'];
-        $user = $request->user()['email'];
-        $essays = Essay::where('uid', $uid)->orderBy('time', 'desc')->get();
-        //$data_str = $essays->toJson();
-        //return $data_str;
-        return view("essay", ['user' => $user, 'essays' => $essays, 'date_today' => date('Y-m-d', time())]);
+        //
     }
 
     /**
@@ -44,38 +41,18 @@ class EssayController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
     {
-        $uid = $request->user()['id'];
-
-        $essay = new Essay();
-
-        $essay->uid = $uid;
-        $essay->time = date('Y-m-d H:i:s', time());
-        $essay->content = $request->essaycontent;
-
-        $sign_today_cnt = Tasksign::where('date', date('Y-m-d'))
-            ->whereHas('task', function ($query) use ($uid) {
-                $query->where('uid', $uid);
-            })
-            ->count();
-
-        if ($sign_today_cnt > 0)
-            $essay->isTasksigned = true;
-        else
-            $essay->isTasksigned = false;
-
-        $essay->save();
-
+        //
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  int $id
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function show($id)
@@ -86,7 +63,7 @@ class EssayController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int $id
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
@@ -97,23 +74,30 @@ class EssayController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request $request
-     * @param  int $id
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
     {
-        //
+        $ogtask = Ongoingtask::find($id);
+        $ogtask->detail = $request->detail;
+        $ogtask->save();
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int $id
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)
     {
-        //
+        $ogtask = Ongoingtask::where('id', $id)->with('task')->first();
+        if($ogtask->task->temporary) {
+            Tasksignheadertask::where('task_id', $ogtask->task_id)->delete();
+            Task::destroy($ogtask->task_id);
+        }
+        Ongoingtask::destroy($id);
     }
 }

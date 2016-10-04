@@ -26,7 +26,7 @@ class RegularTaskController extends Controller
     public function index(Request $request)
     {
         $uid = $request->user()['id'];
-        $Tasks = Task::where('uid', $uid)->where('temporary', false)->where('valid', true)->get();
+        $Tasks = Task::where('uid', $uid)->where('temporary', false)->where('valid', true)->with('family')->get();
         foreach ($Tasks as $task)
         {
             $day_cnt = Tasksign::where('task_id', $task->id)->where('grade','Checked')->count();
@@ -49,12 +49,21 @@ class RegularTaskController extends Controller
 
         $task->uid = $uid;
         $task->startdate = $request->startdate;
-        $task->period = $request->period;
-        $task->activeday = $request->activeday;
-        $task->temporary = false;
-        $task->valid = true;
         $task->title = $request->title;
         $task->description = $request->description;
+        $task->family_id = $request->family_id;
+        $task->temporary = $request->temporary;
+        if(!$task->temporary) {
+            $task->valid = true;
+            $task->period = $request->period;
+            if ($task->period == 0)
+                $task->period = 1;
+            $task->activeday = $request->activeday;
+            $task->type = $request->type;
+        }
+        else {
+            $task->type = "activity";
+        }
 
         $task->save();
 
@@ -138,9 +147,13 @@ class RegularTaskController extends Controller
     {
         $task = Task::find($id);
         $task->period = $request->period;
+        if($task->period == 0)
+            $task->period = 1;
         $task->activeday = $request->activeday;
         $task->title = $request->title;
         $task->description = $request->description;
+        $task->family_id = $request->family_id;
+        $task->type = $request->type;
 
         $task->save();
     }

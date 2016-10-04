@@ -74,7 +74,7 @@
                         <h4 class="panel-title">
                             <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne"
                                aria-expanded="true" aria-controls="collapseOne">
-                                我的梦想/目标
+                                我的小梦想
                             </a>
                         </h4>
                     </div>
@@ -87,7 +87,7 @@
                                 <tr>
                                     <td class="table-control" colspan="4">
                                         <input class="btn btn-primary expand" type="button" id="goal_smt"
-                                               value="添加一个梦想/目标"/>
+                                               value="添加一个小梦想"/>
                                     </td>
                                 </tr>
                                 </tfoot>
@@ -100,7 +100,7 @@
                         <h4 class="panel-title">
                             <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion"
                                href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                                已完结的梦想/目标
+                                已完结的小梦想
                             </a>
                         </h4>
                     </div>
@@ -146,7 +146,7 @@
                     });
                 }
                 function showGoalEdit(id) {
-                    $("#goalModalTitle").html("梦想/目标详情");
+                    $("#goalModalTitle").html("小梦想详情");
                     $("#goal_fm input[type='text']").val("");
                     $("#goal_tasktitle").attr("disabled", true);
                     $("#goal_taskdesc").attr("disabled", true);
@@ -209,7 +209,7 @@
                         });
                     });
                     $("#goal_smt").click(function () {
-                        $("#goalModalTitle").html("添加梦想/目标");
+                        $("#goalModalTitle").html("添加小梦想");
                         $("#goal_fm input[type='text']").val("");
                         $("#goal_fm textarea").val("");
                         $("#goal_fm input[type='date']").val("");
@@ -294,6 +294,7 @@
             </script>
 
         </div>
+
         <div class="right-section col-xs-12 col-sm-8">
             <div class="panel panel-default">
                 <div class="panel-heading">
@@ -323,12 +324,29 @@
                             $("#rgtask_ul").empty();
                             var dataObj = eval("(" + msg + ")");
                             for (i in dataObj) {
-                                $("#rgtask_ul").append("<tr><td class='expand table-control table-text'><button class='btn btn-link' onclick='showRgtaskEdit(\"" + dataObj[i].id + "\")' >" + dataObj[i].title + '</button></td><td><input class="btn btn-info" type="button" value="已经坚持' + dataObj[i].day_cnt + '天" /></td><td class="table-control" id="rgtask_del_id_' + dataObj[i].id + '">{{ csrf_field() }} {{ method_field("DELETE") }}<input class="btn btn-danger" type="button" onclick="delRgtaskLi(' + dataObj[i].id + ')" value="删除" /></td></tr>');
+                                var str = "<tr><td class='expand table-control table-text'><button class='btn btn-link' onclick='showRgtaskEdit(\"" + dataObj[i].id + "\")' >" + dataObj[i].title + '</button></td><td class="table-control"><button class="btn ';
+                                if(dataObj[i].type == "activity")
+                                    str += "btn-warning";
+                                else
+                                    str += "btn-default";
+                                str += '">' + dataObj[i].family.title + '</button></td><td class="table-control"><input class="btn btn-info" type="button" value="已经坚持' + dataObj[i].day_cnt + '天" /></td><td class="table-control" id="rgtask_del_id_' + dataObj[i].id + '">{{ csrf_field() }} {{ method_field("DELETE") }}<input class="btn btn-danger" type="button" onclick="delRgtaskLi(' + dataObj[i].id + ')" value="删除"/></td></tr>';
+                                $("#rgtask_ul").append(str);
                             }
                         }
                     });
                 }
                 function showRgtaskEdit(id) {
+                    $.ajax({
+                        type: "GET",
+                        url: "/task/family",
+                        success: function (msg) {
+                            $("#taskfamily").empty();
+                            var dataObj = eval("(" + msg + ")");
+                            for (i in dataObj) {
+                                $("#taskfamily").append("<option value=" + dataObj[i].id + ">" + dataObj[i].title + '</option>');
+                            }
+                        }
+                    });
                     $("#rgtaskModalTitle").html("任务详情");
                     $("#rgtask_fm input[type='text']").val("");
                     $("#rgtaskEditId").val(id);
@@ -346,6 +364,8 @@
                                     $("#startdate").val(dataObj[i].startdate);
                                     $("#period").val(dataObj[i].period);
                                     $("#taskday").val(dataObj[i].activeday);
+                                    $("#taskfamily").val(dataObj[i].family_id);
+                                    $("#tasktype").val(dataObj[i].type);
                                 }
                             }
                         }
@@ -369,14 +389,157 @@
                 $(document).ready(function () {
                     loadRgtaskUl();
                     $("#rgtask_smt").click(function () {
+                        $.ajax({
+                            type: "GET",
+                            url: "/task/family",
+                            success: function (msg) {
+                                $("#taskfamily").empty();
+                                var dataObj = eval("(" + msg + ")");
+                                for (i in dataObj) {
+                                    $("#taskfamily").append("<option value=" + dataObj[i].id + ">" + dataObj[i].title + '</option>');
+                                }
+                            }
+                        });
                         $("#rgtaskModalTitle").html("新增任务");
                         $("#rgtask_fm input[type='text']").val("");
                         $("#rgtask_fm textarea").val("");
-                        $("#rgtask_fm input[type='date']").val("");
+                        $("#rgtask_fm input[type='date']").val("{{ $date_today }}");
                         $("#rgtask_fm input[type='number']").val("");
                         $("#startdate").removeAttr("disabled");
                         $("#updateRgtask_smt").text("提交");
                         $("#rgtaskEditModal").modal('show');
+                    });
+                });
+            </script>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        任务分类
+                    </h3>
+                </div>
+                <div class="panel-body">
+                    <div id="alertarea"></div>
+                    <table class="form-horizontal center">
+                        <tbody id="family_ul"></tbody>
+                        <tfoot>
+                        <tr>
+                            <td class="table-control" colspan="4">
+                                <input class="btn btn-primary expand" type="button" id="family_smt" value="添加一个分类"/>
+                            </td>
+                        </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+            <script>
+                function loadFamilyUl() {
+                    $.ajax({
+                        type: "GET",
+                        url: "/task/family",
+                        success: function (msg) {
+                            $("#family_ul").empty();
+                            var dataObj = eval("(" + msg + ")");
+                            for (i in dataObj) {
+                                $("#family_ul").append("<tr><td class='expand table-control table-text' id='family_id_" + dataObj[i].id + "'>" + dataObj[i].title + '</td><td class="table-control"><input class="btn btn-primary" type="button" value="修改" onclick="showFamilyEdit(' + dataObj[i].id + ')"/></td><td class="table-control" id="family_del_id_' + dataObj[i].id + '">{{ csrf_field() }} {{ method_field("DELETE") }}<input class="btn btn-danger" type="button" onclick="delFamilyLi(' + dataObj[i].id + ')" value="删除" /></td></tr>');
+                            }
+                        }
+                    });
+                }
+                function showFamilyEdit(id) {
+                    $("#familyModalTitle").html("分类详情");
+                    $("#family_fm input[type='text']").val("");
+                    $("#familyEditId").val(id);
+                    $("#updateFamily_smt").text("修改");
+                    $.ajax({
+                        type: "GET",
+                        url: "/task/family",
+                        success: function (msg) {
+                            var dataObj = eval("(" + msg + ")");
+                            for (i in dataObj) {
+                                if (dataObj[i].id == id) {
+                                    $("#familytitle").val(dataObj[i].title);
+                                    $("#familydesc").val(dataObj[i].description);
+                                    $("#familydest").val(dataObj[i].destination);
+                                }
+                            }
+                        }
+                    });
+                    $("#familyEditModal").modal('show');
+                }
+                function delFamilyLi(id) {
+                    var str_query = "#family_del_id_" + id.toString() + " input";
+                    var str_data = $(str_query).map(function () {
+                        return ($(this).attr("name") + '=' + $(this).val());
+                    }).get().join("&");
+                    $.ajax({
+                        type: "POST",
+                        url: "/task/family/" + id.toString(),
+                        data: str_data,
+                        success: function (msg) {
+                            if(msg == "Error: You cannot delete a family with task in it!") {
+                                var str = '<div class="alert alert-warning fade in"><a href="#" class="close" data-dismiss="alert">&times;</a><strong>警告！</strong>有任务的分类不可被删除。</div>';
+                                $('#alertarea').append(str);
+                            }
+                            if(msg == "Error: You cannot delete this family if it's the only family.") {
+                                var str = '<div class="alert alert-warning fade in"><a href="#" class="close" data-dismiss="alert">&times;</a><strong>警告！</strong>你不能删除唯一存在的分类。</div>';
+                                $('#alertarea').append(str);
+                            }
+                            loadFamilyUl();
+                        }
+                    })
+                }
+                $(document).ready(function () {
+                    loadFamilyUl();
+                    $("#family_smt").click(function () {
+                        $("#familyModalTitle").html("添加分类");
+                        $("#family_fm input[type='text']").val("");
+                        $("#family_fm textarea").val("");
+                        $("#family_fm input[type='date']").val("");
+                        $("#family_fm input[type='number']").val("");
+                        $("#updateFamily_smt").text("提交");
+                        $("#familyEditModal").modal('show');
+                    });
+                    $("#updateFamily_smt").click(function () {
+                        if ($("#familyModalTitle").html() == "添加分类") {
+                            var str_data1 = $("#family_fm input").map(function () {
+                                return ($(this).attr("name") + '=' + $(this).val());
+                            }).get().join("&");
+                            var str_data2 = $("#family_fm textarea").map(function () {
+                                return ($(this).attr("name") + '=' + $(this).val());
+                            }).get().join("&");
+                            var str_data = str_data1 + '&' + str_data2;
+                            $.ajax({
+                                type: "POST",
+                                url: "/task/family",
+                                data: str_data,
+                                success: function (msg) {
+                                    $("#familyEditModal").modal('hide');
+                                    loadFamilyUl();
+                                    //location.reload();
+                                }
+                            });
+                        }
+                        else if ($("#familyModalTitle").html() == "分类详情") {
+                            var str_data1 = $("#family_fm input").map(function () {
+                                return ($(this).attr("name") + '=' + $(this).val());
+                            }).get().join("&");
+                            var str_data2 = $("#family_fm textarea").map(function () {
+                                return ($(this).attr("name") + '=' + $(this).val());
+                            }).get().join("&");
+                            var str_data3 = "_method=PUT";
+                            var str_data = str_data1 + '&' + str_data2 + '&' + str_data3;
+                            var id = $("#familyEditId").val();
+                            $.ajax({
+                                type: "POST",
+                                url: "/task/family/" + id.toString(),
+                                data: str_data,
+                                success: function (msg) {
+                                    $("#familyEditModal").modal('hide');
+                                    loadFamilyUl();
+                                }
+                            });
+                        }
+                        loadRgtaskUl();
                     });
                 })
             </script>
@@ -474,6 +637,54 @@
             </script>
         </div>
     </div>
+    <!-- 模态框（Modal）FamilyEditModal -->
+    <div class="modal fade" id="familyEditModal" tabindex="-1" role="dialog"
+         aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close"
+                            data-dismiss="modal" aria-hidden="true">
+                        &times;
+                    </button>
+                    <h4 class="modal-title" id="familyModalTitle">
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    <div id="family_fm" class="form-horizontal">
+                        {{ csrf_field() }}
+                        <input type="hidden" id="familyEditId"/>
+                        <div class="form-group">
+                            <label for="familytitle" class="col-sm-2 col-sm-offset-1 control-label">分类名称</label>
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control" id="familytitle" name="title">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="familydesc" class="col-sm-2 col-sm-offset-1 col-xs-12 control-label">分类描述</label>
+                            <div class="col-sm-7">
+                                <textarea class="form-control" id="familydesc" name="description"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="familydest" class="col-sm-2 col-sm-offset-1 col-xs-12 control-label">分类目标</label>
+                            <div class="col-sm-7">
+                                <textarea class="form-control" id="familydest" name="destination"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default"
+                            data-dismiss="modal">关闭
+                    </button>
+                    <button id="updateFamily_smt" type="button" class="btn btn-primary">
+                        提交
+                    </button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+    </div>
     <!-- 模态框（Modal）signatureEditModal -->
     <div class="modal fade" id="signatureEditModal" tabindex="-1" role="dialog"
          aria-labelledby="myModalLabel" aria-hidden="true">
@@ -525,14 +736,14 @@
                     <div id="goal_fm" class="form-horizontal">
                         {{ csrf_field() }}
                         <div class="form-group">
-                            <label for="goal_tasktitle" class="col-sm-4 control-label">梦想/目标名称</label>
+                            <label for="goal_tasktitle" class="col-sm-4 control-label">小梦想名称</label>
                             <div class="col-sm-6">
                                 <input type="text" class="form-control" id="goal_tasktitle" name="title">
                             </div>
                         </div>
                         <div class="form-group">
                             <label for="goal_taskdesc"
-                                   class="col-sm-4 col-xs-12 control-label">梦想/目标描述</label>
+                                   class="col-sm-4 col-xs-12 control-label">小梦想描述</label>
                             <div class="col-sm-6">
                                 <textarea class="form-control" id="goal_taskdesc" name="description"></textarea>
                             </div>
@@ -567,7 +778,7 @@
                         &times;
                     </button>
                     <h4 class="modal-title" id="goalDelModalTitle">
-                        完结梦想/目标
+                        完结小梦想
                     </h4>
                 </div>
                 <div class="modal-body">

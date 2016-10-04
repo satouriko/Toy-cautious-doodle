@@ -72,18 +72,26 @@
             $('#comment_p').text(comment);
             $('#showDetailModal').modal('show');
         }
-        function showTptask(id, description) {
+        function showTptask(id, description, detail, taskdate) {
             description = decodeURI(description);
             $('#delTptaskId').val(id);
             $('#description_p').text(description);
+            $('#tp_detail').val(detail);
+            $('#tp_detail').removeAttr('disabled');
+            $('#og_taskdate').val(taskdate);
             $('#delTptask_smt').attr('style', 'display: inline-block');
+            $('#updateOgtask_smt').attr('style', 'display: inline-block');
             $('#showTptaskModal').modal('show');
         }
-        function showTptask_nodel(description) {
+        function showTptask_nodel(description, detail, taskdate) {
             description = decodeURI(description);
             $('#delTptaskId').val();
             $('#description_p').text(description);
+            $('#tp_detail').val(detail);
+            $('#tp_detail').attr('disabled', 'disabled');
+            $('#og_taskdate').val(taskdate);
             $('#delTptask_smt').attr('style', 'display: none');
+            $('#updateOgtask_smt').attr('style', 'display: none');
             $('#showTptaskModal').modal('show');
         }
         $(document).ready(function () {
@@ -94,7 +102,26 @@
                 var id = $('#delTptaskId').val();
                 $.ajax({
                     type: "POST",
-                    url: "/task/tptask/" + id,
+                    url: "/task/ogtask/" + id,
+                    data: str_data,
+                    success: function (msg) {
+                        $('#showTptaskModal').modal('hide');
+                        location.reload();
+                    }
+                });
+            });
+            $("#updateOgtask_smt").click(function () {
+                var str_data1 = $("#updateOgtask_fm input").map(function () {
+                    return ($(this).attr("name") + '=' + $(this).val());
+                }).get().join("&");
+                var str_data2 = $("#updateOgtask_fm textarea").map(function () {
+                    return ($(this).attr("name") + '=' + $(this).val());
+                }).get().join("&");
+                var str_data = str_data1 + '&' + str_data2;
+                var id = $('#delTptaskId').val();
+                $.ajax({
+                    type: "POST",
+                    url: "/task/ogtask/" + id,
                     data: str_data,
                     success: function (msg) {
                         $('#showTptaskModal').modal('hide');
@@ -113,18 +140,29 @@
                         append_str += '<tr>';
                         append_str += '<th>日期</th>';
                         for (j in dataObj[i].header) {
-                            append_str += '<th>' + dataObj[i].header[j].task.title + '</th>';
+                            append_str += '<th>' + dataObj[i].header[j].title + '</th>';
                         }
-                        append_str += '<th>临时任务</th>';
                         append_str += '</tr>';
                         for (day_loop in dataObj[i].tasksigns) {
                             append_str += '<tr>';
                             append_str += '<td>' + day_loop + '</td>';
                             for (j in dataObj[i].header) {
-                                var flag = false;
+                                append_str += '<td><table class="expand little-table">';
                                 for (tasksign_loop in dataObj[i].tasksigns[day_loop]) {
-                                    if (dataObj[i].tasksigns[day_loop][tasksign_loop].task_id == dataObj[i].header[j].task_id) {
-                                        append_str += '<td>';
+                                    if (dataObj[i].tasksigns[day_loop][tasksign_loop].task.family_id == dataObj[i].header[j].id) {
+                                        append_str += '<tr>';
+                                        append_str += '<td><button class="btn btn-link"';
+                                        if (dataObj[i].tasksigns[day_loop][tasksign_loop].grade != 'Pending') {
+                                            append_str += 'onclick="showTptask_nodel(\'' + encodeURI(dataObj[i].tasksigns[day_loop][tasksign_loop].task.description) + '\',\'' + encodeURI(dataObj[i].tasksigns[day_loop][tasksign_loop].detail) + '\',\'' + encodeURI(dataObj[i].tasksigns[day_loop][tasksign_loop].taskdate) + '\')">';
+
+                                        }
+                                        else {
+                                            append_str += 'onclick="showTptask(' + dataObj[i].tasksigns[day_loop][tasksign_loop].id + ',\'' + encodeURI(dataObj[i].tasksigns[day_loop][tasksign_loop].task.description) + '\',\'' + encodeURI(dataObj[i].tasksigns[day_loop][tasksign_loop].detail) + '\',\'' + encodeURI(dataObj[i].tasksigns[day_loop][tasksign_loop].taskdate) + '\')">';
+                                        }
+                                        append_str += dataObj[i].tasksigns[day_loop][tasksign_loop].task.title;
+                                        append_str += '</button></td><td>';
+                                        append_str += dataObj[i].tasksigns[day_loop][tasksign_loop].detail;
+                                        append_str += '</td><td>';
                                         append_str += '<button class="btn expand ';
                                         if (dataObj[i].tasksigns[day_loop][tasksign_loop].grade != 'Pending') {
                                             switch (dataObj[i].tasksigns[day_loop][tasksign_loop].grade) {
@@ -140,69 +178,30 @@
                                                 case "Cancelled":
                                                     append_str += 'btn-warning';
                                                     break;
+                                                case "U-Checked":
+                                                    append_str += 'btn-danger';
+                                                    break;
+                                                case "D-Checked":
+                                                    append_str += 'btn-warning';
+                                                    break;
                                             }
                                             append_str += '" onclick="showDetails(\'' + encodeURI(dataObj[i].tasksigns[day_loop][tasksign_loop].reason) + '\',\'' + encodeURI(dataObj[i].tasksigns[day_loop][tasksign_loop].comment) + '\')">';
                                         }
                                         else {
                                             append_str += 'btn-info">'
                                         }
-                                        append_str += dataObj[i].tasksigns[day_loop][tasksign_loop].grade;
+                                        if(dataObj[i].tasksigns[day_loop][tasksign_loop].grade != 'U-Checked'
+                                                && dataObj[i].tasksigns[day_loop][tasksign_loop].grade != 'D-Checked'
+                                        )
+                                            append_str += dataObj[i].tasksigns[day_loop][tasksign_loop].grade;
+                                        else
+                                            append_str += dataObj[i].tasksigns[day_loop][tasksign_loop].checkdate;
                                         append_str += '</button>';
-                                        append_str += '</td>';
-                                        flag = true;
-                                        break;
+                                        append_str += '</td></tr>';
                                     }
                                 }
-                                if (!flag) {
-                                    append_str += '<td></td>';
-                                }
+                                append_str += '</table></td>';
                             }
-                            append_str += '<td><table class="expand little-table">';
-                            for (tasksign_loop in dataObj[i].tasksigns[day_loop]) {
-                                var flag = false;
-                                for (j in dataObj[i].header) {
-                                    if (dataObj[i].tasksigns[day_loop][tasksign_loop].task_id == dataObj[i].header[j].task_id)
-                                        flag = true;
-                                }
-                                if (!flag) {
-                                    append_str += '<tr>';
-                                    append_str += '<td><button class="btn btn-link"';
-                                    if (dataObj[i].tasksigns[day_loop][tasksign_loop].grade != 'Pending') {
-                                        append_str += 'onclick="showTptask_nodel(\'' + encodeURI(dataObj[i].tasksigns[day_loop][tasksign_loop].task.description) + '\')">';
-
-                                    }
-                                    else {
-                                        append_str += 'onclick="showTptask(' + dataObj[i].tasksigns[day_loop][tasksign_loop].task_id + ',\'' + encodeURI(dataObj[i].tasksigns[day_loop][tasksign_loop].task.description) + '\')">';
-                                    }
-                                    append_str += dataObj[i].tasksigns[day_loop][tasksign_loop].task.title;
-                                    append_str += '</button></td><td>';
-                                    append_str += '<button class="btn expand ';
-                                    if (dataObj[i].tasksigns[day_loop][tasksign_loop].grade != 'Pending') {
-                                        switch (dataObj[i].tasksigns[day_loop][tasksign_loop].grade) {
-                                            case "Checked":
-                                                append_str += 'btn-success';
-                                                break;
-                                            case "Unchecked":
-                                                append_str += 'btn-danger';
-                                                break;
-                                            case "Delayed":
-                                                append_str += 'btn-warning';
-                                                break;
-                                            case "Cancelled":
-                                                append_str += 'btn-warning';
-                                                break;
-                                        }
-                                        append_str += '" onclick="showDetails(\'' + encodeURI(dataObj[i].tasksigns[day_loop][tasksign_loop].reason) + '\',\'' + encodeURI(dataObj[i].tasksigns[day_loop][tasksign_loop].comment) + '\')">';
-                                    }
-                                    else {
-                                        append_str += 'btn-info">'
-                                    }
-                                    append_str += dataObj[i].tasksigns[day_loop][tasksign_loop].grade;
-                                    append_str += '</button>';
-                                    append_str += '</td></tr>';
-                                }
-                            }
-                            append_str += '</table></td>';
                         }
                         append_str += '</table>';
                         $("#tasksign_ul").append(append_str);
@@ -256,9 +255,27 @@
                     </h4>
                 </div>
                 <div class="modal-body">
-                    <div class="form-horizontal">
-                        <label>任务描述</label>
-                        <p id="description_p"></p>
+                    <div class="form-horizontal" id="updateOgtask_fm">
+                        {{ csrf_field() }}
+                        {{ method_field("PUT") }}
+                        <div class="form-group">
+                            <label class="col-sm-2 col-sm-offset-1 control-label">任务描述</label>
+                            <div class="col-sm-8">
+                                <p id="description_p"></p>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="og_taskdate" class="col-sm-2 col-sm-offset-1 control-label">任务日</label>
+                            <div class="col-sm-6">
+                                <input type="date" class="form-control" id="og_taskdate" name="taskdate" disabled>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="tp_detail" class="col-sm-2 col-sm-offset-1 control-label">具体描述</label>
+                            <div class="col-sm-8">
+                                <textarea type="text" class="form-control" id="tp_detail" name="detail"></textarea>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div id="delTptask_fm">
@@ -269,6 +286,9 @@
                 <div class="modal-footer">
                     <button id="delTptask_smt" type="button" class="btn btn-danger">
                         删除此任务
+                    </button>
+                    <button id="updateOgtask_smt" type="button" class="btn btn-primary">
+                        更新
                     </button>
                     <button type="button" class="btn btn-default"
                             data-dismiss="modal">关闭

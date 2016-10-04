@@ -2,13 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Nickname;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 
-class ProfileController extends Controller
+class DestinationController extends Controller
 {
     public function __construct()
     {
@@ -18,7 +17,6 @@ class ProfileController extends Controller
     public function index(Request $request)
     {
         $user = $request->user()['email'];
-        $uid = $request->user()['id'];
-        return view('profile', ['user' => $user, 'uid' => $uid, 'date_today' => date('Y-m-d', time())]);
+        return view('destination', ['user' => $user, 'date_today' => date('Y-m-d', time())]);
     }
 }
